@@ -1,9 +1,12 @@
-IrrlichtMt version 1.9
-======================
+IrrlichtMt fork
+===============
 
 IrrlichtMt is the 3D engine of [Minetest](https://github.com/minetest).
 It is based on the [Irrlicht Engine](https://irrlicht.sourceforge.io/) but is now developed independently.
-It is intentionally not compatible to upstream and is planned to be eventually absorbed into Minetest.
+
+The original [IrrlichtMt](https://github.com/minetest/irrlicht) repository has been merged into the Minetest tree.
+The goal of this repository is to continue the spirit of a standalone library by backporting crucial fixes from Minetest and the upstream Irrlicht source.
+
 
 Build
 -----
@@ -11,6 +14,7 @@ Build
 The build system is CMake.
 
 The following libraries are required to be installed:
+
 * zlib, libPNG, libJPEG
 * OpenGL
   * or on mobile: OpenGL ES (can be optionally enabled on desktop too)
@@ -18,6 +22,7 @@ The following libraries are required to be installed:
 * SDL2 (see below)
 
 Aside from standard search options (`ZLIB_INCLUDE_DIR`, `ZLIB_LIBRARY`, ...) the following options are available:
+
 * `BUILD_SHARED_LIBS` (default: `ON`) - Build IrrlichtMt as a shared library
 * `BUILD_EXAMPLES` (default: `OFF`) - Build example applications
 * `ENABLE_OPENGL` - Enable OpenGL driver
@@ -26,16 +31,21 @@ Aside from standard search options (`ZLIB_INCLUDE_DIR`, `ZLIB_LIBRARY`, ...) the
 * `ENABLE_GLES2` - Enable OpenGL ES 2+ driver
 * `USE_SDL2` (default: platform-dependent, usually `ON`) - Use SDL2 instead of older native device code
 
-e.g. on a Linux system you might want to build for local use like this:
+Note: if `zconf.h` cannot be found due to separate (out-of-tree) build directories,
+do specify two paths in the same CMake option. e.g. `/path/to/zlib;/path/to/zlib_build`.
 
-	git clone https://github.com/minetest/irrlicht
+CMake will create the file `${BUILD_DIR}/cmake/IrrlichtMtTargets.cmake` which it can then be imported from another project by pointing `find_package()` or the `CMAKE_PREFIX_PATH` variable to the build directory.
+
+
+### Build on Linux
+
+	git clone https://github.com/THIS_REPO/NAME
 	cd irrlicht
 	cmake . -DBUILD_SHARED_LIBS=OFF
-	make -j$(nproc)
+	make -j
 
-This will put an IrrlichtMtTargets.cmake file into the cmake directory in the current build directory, and it can then be imported from another project by pointing `find_package()` to the build directory, or by setting the `CMAKE_PREFIX_PATH` variable to that same path.
 
-on Windows system:
+### Build on Windows
 
 It is highly recommended to use vcpkg as package manager.
 
@@ -49,11 +59,13 @@ Run the following script in PowerShell:
 	cd irrlicht
 	cmake -B build -G "Visual Studio 17 2022" -A "Win64" -DCMAKE_TOOLCHAIN_FILE=[vcpkg-root]/scripts/buildsystems/vcpkg.cmake -DBUILD_SHARED_LIBS=OFF
 	cmake --build build --config Release
-	
+
+
 Platforms
 ---------
 
 We aim to support these platforms:
+
 * Windows via MinGW
 * Linux (GL or GLES)
 * macOS
