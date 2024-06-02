@@ -275,8 +275,8 @@ void CWGLManager::terminate()
 	if (CurrentContext.OpenGLWin32.HDc)
 		ReleaseDC((HWND)CurrentContext.OpenGLWin32.HWnd, (HDC)CurrentContext.OpenGLWin32.HDc);
 	if (PrimaryContext.OpenGLWin32.HDc && PrimaryContext.OpenGLWin32.HDc == CurrentContext.OpenGLWin32.HDc)
-		memset(&PrimaryContext, 0, sizeof(PrimaryContext));
-	memset(&CurrentContext, 0, sizeof(CurrentContext));
+		memset((void *)&PrimaryContext, 0, sizeof(PrimaryContext));
+	memset((void *)&CurrentContext, 0, sizeof(CurrentContext));
 	if (libHandle)
 		FreeLibrary(libHandle);
 }

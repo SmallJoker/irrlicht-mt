@@ -25,11 +25,32 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 
+if(WIN32)
+	# Detect whether the build is run within Wine
+	execute_process(
+		COMMAND tasklist /NH /FI "ImageName eq winedevice.exe"
+		OUTPUT_VARIABLE TASKLIST_OUTPUT
+	)
+	string(REGEX MATCHALL "\n" TASKLIST_LINES "${TASKLIST_OUTPUT}")
+	string(LENGTH "${TASKLIST_LINES}" TASKLIST_LINES)
+	if(TASKLIST_LINES GREATER 2)
+		set(WINE 1)
+	endif()
+	unset(TASKLIST_OUTPUT)
+	unset(TASKLIST_LINES)
+endif()
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang|AppleClang)$")
 	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 	set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
-	add_compile_options(-Wall -pipe -fno-exceptions)
+	if(WINE)
+		# As of Wine 9.8, "-pipe" results in corrupted assembler output (junk instructions)
+		message(STATUS "Disabled -pipe option (Wine detected)")
+		add_compile_options(-Wall -fno-exceptions)
+	else()
+		add_compile_options(-Wall -pipe -fno-exceptions)
+	endif()
 
 	# Enable SSE for floating point math on 32-bit x86 by default
 	# reasoning see minetest issue #11810 and https://gcc.gnu.org/wiki/FloatingPointMath
