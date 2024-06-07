@@ -355,29 +355,34 @@ void CGUIEnvironment::OnPostRender(u32 time)
 			HoveredNoSubelement->getToolTipText().size() &&
 			getSkin() &&
 			getSkin()->getFont(EGDF_TOOLTIP)) {
-		core::rect<s32> pos;
 
-		pos.UpperLeftCorner = LastHoveredMousePos;
-		core::dimension2du dim = getSkin()->getFont(EGDF_TOOLTIP)->getDimension(HoveredNoSubelement->getToolTipText().c_str());
+		const wchar_t *tooltip_text = HoveredNoSubelement->getToolTipText().c_str();
+		const s32 text_spacing_y = getSkin()->getSize(EGDS_TEXT_DISTANCE_Y);
+
+		core::dimension2du dim = getSkin()->getFont(EGDF_TOOLTIP)->getDimension(tooltip_text);
 		dim.Width += getSkin()->getSize(EGDS_TEXT_DISTANCE_X) * 2;
-		dim.Height += getSkin()->getSize(EGDS_TEXT_DISTANCE_Y) * 2;
+		dim.Height += text_spacing_y * 2;
 
+		core::rect<s32> pos;
+		pos.UpperLeftCorner = LastHoveredMousePos;
 		pos.UpperLeftCorner.Y -= dim.Height + 1;
-		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + dim.Height - 1;
 		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + dim.Width;
+		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + dim.Height - 1;
 
 		pos.constrainTo(getAbsolutePosition());
 
-		ToolTip.Element = addStaticText(HoveredNoSubelement->getToolTipText().c_str(), pos, true, true, this, -1, true);
+		ToolTip.Element = addStaticText(tooltip_text, pos, true, true, this, -1, true);
 		ToolTip.Element->setOverrideColor(getSkin()->getColor(EGDC_TOOLTIP));
 		ToolTip.Element->setBackgroundColor(getSkin()->getColor(EGDC_TOOLTIP_BACKGROUND));
 		ToolTip.Element->setOverrideFont(getSkin()->getFont(EGDF_TOOLTIP));
+		ToolTip.Element->setTextAlignment(EGUIA_UPPERLEFT, EGUIA_CENTER);
 		ToolTip.Element->setSubElement(true);
 		ToolTip.Element->grab();
 
+		// Word wrap might have changed the required height. Adjust accordingly.
 		s32 textHeight = ToolTip.Element->getTextHeight();
 		pos = ToolTip.Element->getRelativePosition();
-		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + textHeight;
+		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + textHeight + text_spacing_y * 2;
 		ToolTip.Element->setRelativePosition(pos);
 	}
 
