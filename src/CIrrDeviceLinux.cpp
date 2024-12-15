@@ -286,13 +286,14 @@ void CIrrDeviceLinux::setupTopLevelXorgWindow()
 	os::Printer::log("Configuring X11-specific top level window properties", ELL_DEBUG);
 
 	// Set application name and class hints. For now name and class are the same.
-	// Note: SDL uses the executable name here (i.e. "minetest").
-	XClassHint *classhint = XAllocClassHint();
-	classhint->res_name = const_cast<char *>("Minetest");
-	classhint->res_class = const_cast<char *>("Minetest");
+	// Note: SDL uses the executable name here.
+	{
+		XClassHint classhint;
+		classhint.res_name = const_cast<char *>(CreationParams.ApplicationName);
+		classhint.res_class = const_cast<char *>(CreationParams.ApplicationName);
 
-	XSetClassHint(XDisplay, XWindow, classhint);
-	XFree(classhint);
+		XSetClassHint(XDisplay, XWindow, &classhint);
+	}
 
 	// FIXME: In the future WMNormalHints should be set ... e.g see the
 	// gtk/gdk code (gdk/x11/gdksurface-x11.c) for the setup_top_level

@@ -39,6 +39,7 @@ struct SIrrlichtCreationParameters
 			Stereobuffer(false),
 			EventReceiver(0),
 			WindowId(0),
+			ApplicationName("IrrlichtMt application"),
 #ifdef _DEBUG
 			LoggingLevel(ELL_DEBUG),
 #else
@@ -80,6 +81,7 @@ struct SIrrlichtCreationParameters
 		Stereobuffer = other.Stereobuffer;
 		EventReceiver = other.EventReceiver;
 		WindowId = other.WindowId;
+		ApplicationName = other.ApplicationName;
 		LoggingLevel = other.LoggingLevel;
 		PrivateData = other.PrivateData;
 		OGLES2ShaderPath = other.OGLES2ShaderPath;
@@ -239,6 +241,8 @@ struct SIrrlichtCreationParameters
 	However, there is no need to draw the picture this often. Just
 	do it how you like. */
 	void *WindowId;
+
+	const char *ApplicationName;
 
 	//! Specifies the logging level used in the logging interface.
 	/** The default value is ELL_INFORMATION. You can access the ILogger interface
