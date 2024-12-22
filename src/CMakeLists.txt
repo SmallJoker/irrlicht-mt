@@ -359,17 +359,6 @@ add_library(IRRMESHOBJ OBJECT
 	${IRRMESHLOADER}
 )
 
-add_library(IRROBJ OBJECT
-	CBillboardSceneNode.cpp
-	CCameraSceneNode.cpp
-	CDummyTransformationSceneNode.cpp
-	CEmptySceneNode.cpp
-	CMeshManipulator.cpp
-	CSceneCollisionManager.cpp
-	CSceneManager.cpp
-	CMeshCache.cpp
-)
-
 set(IRRDRVROBJ
 	CNullDriver.cpp
 	CGLXManager.cpp
@@ -502,14 +491,29 @@ add_library(IRRGUIOBJ OBJECT
 
 # Library
 
-add_library(IrrlichtMt)
+# There have to be some sources in IrrlichtMt to workaround Cmake Xcode generator bug
+add_library(IrrlichtMt
+	CBillboardSceneNode.cpp
+	CCameraSceneNode.cpp
+	CDummyTransformationSceneNode.cpp
+	CEmptySceneNode.cpp
+	CMeshManipulator.cpp
+	CSceneCollisionManager.cpp
+	CSceneManager.cpp
+	CMeshCache.cpp
+)
 foreach(object_lib
-	IRRMESHOBJ IRROBJ IRRVIDEOOBJ
+	IRRMESHOBJ IRRVIDEOOBJ
 	IRRIOOBJ IRROTHEROBJ IRRGUIOBJ)
 	# Set include directories for object library compilation
 	target_include_directories(${object_lib} PRIVATE ${link_includes})
-	# Add objects from object library to main library
-	target_sources(IrrlichtMt PRIVATE $<TARGET_OBJECTS:${object_lib}>)
+	if(CMAKE_GENERATOR STREQUAL "Xcode")
+		# Workaround for Cmake Xcode project generator
+		target_link_libraries(IrrlichtMt PRIVATE ${object_lib})
+	else()
+		# Add objects from object library to main library
+		target_sources(IrrlichtMt PRIVATE $<TARGET_OBJECTS:${object_lib}>)
+	endif()
 endforeach()
 
 # Alias target provides add_submodule compatibility
