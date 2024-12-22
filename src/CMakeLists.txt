@@ -181,12 +181,6 @@ else()
 	option(ENABLE_OPENGL "Enable OpenGL" TRUE)
 endif()
 
-if(USE_SDL2 OR EMSCRIPTEN OR APPLE)
-	set(ENABLE_GLES1 FALSE)
-else()
-	option(ENABLE_GLES1 "Enable OpenGL ES" FALSE)
-endif()
-
 if(APPLE)
 	set(ENABLE_GLES2 FALSE)
 	set(ENABLE_WEBGL1 FALSE)
@@ -223,14 +217,6 @@ if(ENABLE_OPENGL3)
 	endif()
 endif()
 
-if(ENABLE_GLES1)
-	add_definitions(-D_IRR_COMPILE_WITH_OGLES1_)
-	set(OPENGLES_DIRECT_LINK TRUE)
-	if(DEVICE MATCHES "^(WINDOWS|X11)$")
-		add_definitions(-D_IRR_COMPILE_WITH_EGL_MANAGER_)
-	endif()
-endif()
-
 if(ENABLE_GLES2)
 	add_definitions(-D_IRR_COMPILE_WITH_OGLES2_)
 	if(DEVICE MATCHES "^(WINDOWS|X11)$" OR EMSCRIPTEN)
@@ -255,7 +241,6 @@ endif()
 message(STATUS "Device: ${DEVICE}")
 message(STATUS "OpenGL: ${ENABLE_OPENGL}")
 message(STATUS "OpenGL 3: ${ENABLE_OPENGL3}")
-message(STATUS "OpenGL ES: ${ENABLE_GLES1}")
 if (ENABLE_GLES2)
 	message(STATUS "OpenGL ES 2: ON (unified)")
 else()
@@ -269,14 +254,6 @@ find_package(ZLIB REQUIRED)
 find_package(JPEG REQUIRED)
 find_package(PNG REQUIRED)
 
-
-if(ENABLE_GLES1)
-	# only tested on Android, probably works on Linux (is this needed anywhere else?)
-	find_library(OPENGLES_LIBRARY NAMES GLESv1_CM REQUIRED)
-	find_library(EGL_LIBRARY NAMES EGL REQUIRED)
-
-	message(STATUS "Found OpenGLES: ${OPENGLES_LIBRARY}")
-endif()
 if(ENABLE_GLES2)
 	find_package(OpenGLES2 REQUIRED)
 endif()
@@ -407,14 +384,6 @@ if(ENABLE_OPENGL)
 		COpenGLDriver.cpp
 		COpenGLSLMaterialRenderer.cpp
 		COpenGLExtensionHandler.cpp
-	)
-endif()
-
-if(ENABLE_GLES1)
-	set(IRRDRVROBJ
-		${IRRDRVROBJ}
-		COGLESDriver.cpp
-		COGLESExtensionHandler.cpp
 	)
 endif()
 
@@ -560,7 +529,6 @@ target_link_libraries(IrrlichtMt PRIVATE
 	"$<$<BOOL:${USE_SDL2}>:SDL2::SDL2>"
 
 	"$<$<BOOL:${OPENGL_DIRECT_LINK}>:${OPENGL_LIBRARIES}>"
-	"$<$<BOOL:${OPENGLES_DIRECT_LINK}>:${OPENGLES_LIBRARY}>"
 	${EGL_LIBRARY}
 
 	# incl. transitive SDL2 dependencies for static linking

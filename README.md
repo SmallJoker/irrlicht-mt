@@ -27,7 +27,6 @@ Aside from standard search options (`ZLIB_INCLUDE_DIR`, `ZLIB_LIBRARY`, ...) the
 * `BUILD_EXAMPLES` (default: `OFF`) - Build example applications
 * `ENABLE_OPENGL` - Enable OpenGL driver
 * `ENABLE_OPENGL3` (default: `OFF`) - Enable OpenGL 3+ driver
-* `ENABLE_GLES1` - Enable OpenGL ES driver, legacy
 * `ENABLE_GLES2` - Enable OpenGL ES 2+ driver
 * `USE_SDL2` (default: platform-dependent, usually `ON`) - Use SDL2 instead of older native device code
 
@@ -52,7 +51,7 @@ It is highly recommended to use vcpkg as package manager.
 After you successfully built vcpkg you can easily install the required libraries:
 
 	vcpkg install zlib libjpeg-turbo libpng sdl2 --triplet x64-windows
-	
+
 Run the following script in PowerShell:
 
 	git clone https://github.com/minetest/irrlicht
