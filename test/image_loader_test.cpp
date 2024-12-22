@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <vector>
 #include <irrlicht.h>
+#include <IImage.h>
+#include <IVideoDriver.h>
 
 using namespace irr;
 

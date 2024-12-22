@@ -1,6 +1,13 @@
 #include <iostream>
 #include <irrlicht.h>
 #include "exampleHelper.h"
+#include <IFileSystem.h>
+#include <IAnimatedMeshSceneNode.h>
+#include <IGUIButton.h>
+#include <IGUIEditBox.h>
+#include <IGUIEnvironment.h>
+#include <ISceneManager.h>
+#include <IVideoDriver.h>
 
 using namespace irr;
 
@@ -14,8 +21,6 @@ static video::E_DRIVER_TYPE chooseDriver(core::stringc arg_)
 {
 	if (arg_ == "null")
 		return video::EDT_NULL;
-	if (arg_ == "ogles1")
-		return video::EDT_OGLES1;
 	if (arg_ == "ogles2")
 		return video::EDT_OGLES2;
 	if (arg_ == "opengl")
@@ -99,7 +104,6 @@ int main(int argc, char *argv[])
 		scene::IAnimatedMeshSceneNode *node = smgr->addAnimatedMeshSceneNode(mesh);
 		if (node) {
 			node->forEachMaterial([tex](video::SMaterial &mat) {
-				mat.Lighting = false;
 				mat.setTexture(0, tex);
 			});
 			node->setFrameLoop(0, 29);
