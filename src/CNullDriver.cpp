@@ -1165,6 +1165,8 @@ void CNullDriver::updateAllHardwareBuffers()
 				deleteHardwareBuffer(Link);
 		}
 	}
+
+	FrameStats.HWBuffersActive = HWBufferList.size();
 }
 
 void CNullDriver::deleteHardwareBuffer(SHWBufferLink *HWBuffer)
