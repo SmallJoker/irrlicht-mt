@@ -92,10 +92,6 @@ SkinnedMesh::SkinnedMesh() :
 		HasAnimation(false), PreparedForSkinning(false),
 		AnimateNormals(true), HardwareSkinning(false)
 {
-#ifdef _DEBUG
-	setDebugName("SkinnedMesh");
-#endif
-
 	SkinningBuffers = &LocalBuffers;
 }
 
