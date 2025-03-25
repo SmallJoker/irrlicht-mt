@@ -85,6 +85,7 @@ struct SIrrlichtCreationParameters
 		LoggingLevel = other.LoggingLevel;
 		PrivateData = other.PrivateData;
 		OGLES2ShaderPath = other.OGLES2ShaderPath;
+		DriverDebug = other.DriverDebug;
 		return *this;
 	}
 
