@@ -8,6 +8,7 @@
 #include "IAnimatedMeshSceneNode.h"
 #include "SSkinMeshBuffer.h"
 #include "os.h"
+#include <cassert>
 
 namespace irr
 {
@@ -619,19 +620,19 @@ SkinnedMesh::SJoint *SkinnedMeshBuilder::addJoint(SJoint *parent)
 
 void SkinnedMeshBuilder::addPositionKey(SJoint *joint, f32 frame, core::vector3df pos)
 {
-	_IRR_DEBUG_BREAK_IF(!joint);
+	assert(joint);
 	joint->keys.position.pushBack(frame, pos);
 }
 
 void SkinnedMeshBuilder::addScaleKey(SJoint *joint, f32 frame, core::vector3df scale)
 {
-	_IRR_DEBUG_BREAK_IF(!joint);
+	assert(joint);
 	joint->keys.scale.pushBack(frame, scale);
 }
 
 void SkinnedMeshBuilder::addRotationKey(SJoint *joint, f32 frame, core::quaternion rot)
 {
-	_IRR_DEBUG_BREAK_IF(!joint);
+	assert(joint);
 	joint->keys.rotation.pushBack(frame, rot);
 }
 

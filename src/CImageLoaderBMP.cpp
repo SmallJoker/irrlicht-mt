@@ -126,7 +126,7 @@ exit:
 // how many bytes will be touched given the current state of decompress4BitRLE
 static inline u32 shiftedCount(s32 count, s32 shift)
 {
-	_IRR_DEBUG_BREAK_IF(count < 0)
+	assert(count >= 0);
 	u32 ret = count / 2;
 	if (shift == 0 || count % 2 == 1)
 		++ret;

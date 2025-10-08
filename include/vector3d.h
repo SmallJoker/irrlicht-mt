@@ -7,6 +7,7 @@
 #include "irrMath.h"
 
 #include <functional>
+#include <cassert>
 
 namespace irr
 {
