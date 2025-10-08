@@ -298,25 +298,9 @@ u32 CNullDriver::getTextureCount() const
 
 ITexture *CNullDriver::addTexture(const core::dimension2d<u32> &size, const io::path &name, ECOLOR_FORMAT format)
 {
-	if (0 == name.size()) {
-		os::Printer::log("Could not create ITexture, texture needs to have a non-empty name.", ELL_WARNING);
-		return 0;
-	}
-
 	IImage *image = new CImage(format, size);
-	ITexture *t = 0;
-
-	if (checkImage(image)) {
-		t = createDeviceDependentTexture(name, image);
-	}
-
+	ITexture *t = addTexture(name, image);
 	image->drop();
-
-	if (t) {
-		addTexture(t);
-		t->drop();
-	}
-
 	return t;
 }
 
@@ -333,7 +317,8 @@ ITexture *CNullDriver::addTexture(const io::path &name, IImage *image)
 	ITexture *t = 0;
 
 	if (checkImage(image)) {
-		t = createDeviceDependentTexture(name, image);
+		std::vector tmp { image };
+		t = createDeviceDependentTexture(name, ETT_2D, tmp);
 	}
 
 	if (t) {
@@ -341,6 +326,27 @@ ITexture *CNullDriver::addTexture(const io::path &name, IImage *image)
 		t->drop();
 	}
 
+	return t;
+}
+
+ITexture *CNullDriver::addArrayTexture(const io::path &name, IImage **images, u32 count)
+{
+	if (0 == name.size()) {
+		os::Printer::log("Could not create ITexture, texture needs to have a non-empty name.", ELL_WARNING);
+		return 0;
+	}
+
+	// this is stupid but who cares
+	std::vector<IImage*> tmp(images, images + count);
+
+	ITexture *t = nullptr;
+	if (checkImage(tmp)) {
+		t = createDeviceDependentTexture(name, ETT_2D_ARRAY, tmp);
+	}
+	if (t) {
+		addTexture(t);
+		t->drop();
+	}
 	return t;
 }
 
@@ -361,7 +367,7 @@ ITexture *CNullDriver::addTextureCubemap(const io::path &name, IImage *imagePosX
 	imageArray.push_back(imageNegZ);
 
 	if (checkImage(imageArray)) {
-		t = createDeviceDependentTextureCubemap(name, imageArray);
+		t = createDeviceDependentTexture(name, ETT_CUBEMAP, imageArray);
 	}
 
 	if (t) {
@@ -388,7 +394,7 @@ ITexture *CNullDriver::addTextureCubemap(const irr::u32 sideLen, const io::path 
 
 	ITexture *t = 0;
 	if (checkImage(imageArray)) {
-		t = createDeviceDependentTextureCubemap(name, imageArray);
+		t = createDeviceDependentTexture(name, ETT_CUBEMAP, imageArray);
 
 		if (t) {
 			addTexture(t);
@@ -483,7 +489,8 @@ video::ITexture *CNullDriver::loadTextureFromFile(io::IReadFile *file, const io:
 		return nullptr;
 
 	if (checkImage(image)) {
-		texture = createDeviceDependentTexture(hashName.size() ? hashName : file->getFileName(), image);
+		std::vector tmp { image };
+		texture = createDeviceDependentTexture(hashName.size() ? hashName : file->getFileName(), ETT_2D, tmp);
 		if (texture)
 			os::Printer::log("Loaded texture", file->getFileName(), ELL_DEBUG);
 	}
@@ -523,16 +530,14 @@ video::ITexture *CNullDriver::findTexture(const io::path &filename)
 	return 0;
 }
 
-ITexture *CNullDriver::createDeviceDependentTexture(const io::path &name, IImage *image)
+ITexture *CNullDriver::createDeviceDependentTexture(const io::path &name, E_TEXTURE_TYPE type,
+		const std::vector<IImage*> &images)
 {
-	SDummyTexture *dummy = new SDummyTexture(name, ETT_2D);
-	dummy->setSize(image->getDimension());
+	if (type != ETT_2D && type != ETT_CUBEMAP)
+		return nullptr;
+	SDummyTexture *dummy = new SDummyTexture(name, type);
+	dummy->setSize(images[0]->getDimension());
 	return dummy;
-}
-
-ITexture *CNullDriver::createDeviceDependentTextureCubemap(const io::path &name, const std::vector<IImage*> &image)
-{
-	return new SDummyTexture(name, ETT_CUBEMAP);
 }
 
 bool CNullDriver::setRenderTargetEx(IRenderTarget *target, u16 clearFlag, SColor clearColor, f32 clearDepth, u8 clearStencil)
@@ -887,6 +892,9 @@ bool CNullDriver::checkImage(const std::vector<IImage*> &image) const
 	auto lastSize = image[0]->getDimension();
 
 	for (size_t i = 0; i < image.size(); ++i) {
+		if (!image[i])
+			return false;
+
 		ECOLOR_FORMAT format = image[i]->getColorFormat();
 		auto size = image[i]->getDimension();
 
