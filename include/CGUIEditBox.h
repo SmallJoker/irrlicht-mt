@@ -12,6 +12,9 @@ namespace irr
 {
 namespace gui
 {
+
+class IGUIScrollBar;
+
 class CGUIEditBox : public IGUIEditBox
 {
 public:
@@ -159,6 +162,8 @@ protected:
 	void sendGuiEvent(EGUI_EVENT_TYPE type);
 	//! set text markers
 	void setTextMarkers(s32 begin, s32 end);
+	//! update the vertical scrollBar (visibilty & position)
+	void updateVScrollBar();
 
 	bool processKey(const SEvent &event);
 	//! KEY_LEFT / KEY_RIGHT inputs
@@ -195,6 +200,8 @@ protected:
 	s32 CursorPos;
 	s32 HScrollPos, VScrollPos; // scroll position in characters
 	u32 Max;
+	u32 VScrollBarWidth = 0;
+	IGUIScrollBar *VScrollBar = nullptr;
 
 	bool WordWrap = false,
 		MultiLine = false,
