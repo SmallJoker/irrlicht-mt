@@ -363,19 +363,33 @@ set(link_includes
 # Source files
 
 set(IRRMESHLOADER
+	CB3DMeshFileLoader.h
+	COBJMeshFileLoader.h
+	CXMeshFileLoader.h
+
 	CB3DMeshFileLoader.cpp
 	COBJMeshFileLoader.cpp
 	CXMeshFileLoader.cpp
 )
 
 add_library(IRRMESHOBJ OBJECT
+	CMeshSceneNode.h
+	CAnimatedMeshSceneNode.h
+
 	SkinnedMesh.cpp
 	CMeshSceneNode.cpp
 	CAnimatedMeshSceneNode.cpp
+
 	${IRRMESHLOADER}
 )
 
 set(IRRDRVROBJ
+	CNullDriver.h
+	CGLXManager.h
+	CWGLManager.h
+	CEGLManager.h
+	CSDLManager.h
+
 	CNullDriver.cpp
 	CGLXManager.cpp
 	CWGLManager.cpp
@@ -389,6 +403,11 @@ set(IRRDRVROBJ
 if(ENABLE_OPENGL)
 	set(IRRDRVROBJ
 		${IRRDRVROBJ}
+		COpenGLCacheHandler.h
+		COpenGLDriver.h
+		COpenGLSLMaterialRenderer.h
+		COpenGLExtensionHandler.h
+
 		COpenGLCacheHandler.cpp
 		COpenGLDriver.cpp
 		COpenGLSLMaterialRenderer.cpp
@@ -399,8 +418,11 @@ endif()
 # the unified drivers
 
 if(ENABLE_OPENGL3 OR ENABLE_GLES2)
+	file(GLOB IRRDRVR_HDRS "${CMAKE_CURRENT_SOURCE_DIR}/OpenGL/*.h")
+
 	set(IRRDRVROBJ
 		${IRRDRVROBJ}
+		${IRRDRVR_HDRS}
 		OpenGL/Driver.cpp
 		OpenGL/ExtensionHandler.cpp
 		OpenGL/FixedPipelineRenderer.cpp
@@ -413,6 +435,7 @@ endif()
 if(ENABLE_OPENGL3)
 	set(IRRDRVROBJ
 		${IRRDRVROBJ}
+		OpenGL3/DriverGL3.h
 		OpenGL3/DriverGL3.cpp
 	)
 endif()
@@ -420,11 +443,21 @@ endif()
 if(ENABLE_GLES2)
 	set(IRRDRVROBJ
 		${IRRDRVROBJ}
+		OpenGLES2/DriverGLES2.h
 		OpenGLES2/DriverGLES2.cpp
 	)
 endif()
 
 set(IRRIMAGEOBJ
+	CColorConverter.h
+	CImage.h
+	CImageLoaderBMP.h
+	CImageLoaderJPG.h
+	CImageLoaderPNG.h
+	CImageLoaderTGA.h
+	CImageWriterJPG.h
+	CImageWriterPNG.h
+
 	CColorConverter.cpp
 	CImage.cpp
 	CImageLoaderBMP.cpp
@@ -436,12 +469,21 @@ set(IRRIMAGEOBJ
 )
 
 add_library(IRRVIDEOOBJ OBJECT
+	CFPSCounter.h
 	CFPSCounter.cpp
 	${IRRDRVROBJ}
 	${IRRIMAGEOBJ}
 )
 
 add_library(IRRIOOBJ OBJECT
+	CFileList.h
+	CFileSystem.h
+	CLimitReadFile.h
+	CMemoryFile.h
+	CReadFile.h
+	CWriteFile.h
+	CZipReader.h
+
 	CFileList.cpp
 	CFileSystem.cpp
 	CLimitReadFile.cpp
@@ -452,6 +494,14 @@ add_library(IRRIOOBJ OBJECT
 )
 
 add_library(IRROTHEROBJ OBJECT
+	CIrrDeviceSDL.h
+	CIrrDeviceLinux.h
+	CIrrDeviceStub.h
+	CIrrDeviceWin32.h
+	CLogger.h
+	COSOperator.h
+	os.h
+
 	CIrrDeviceSDL.cpp
 	CIrrDeviceLinux.cpp
 	CIrrDeviceStub.cpp
@@ -488,6 +538,22 @@ if(USE_XCURSOR)
 endif()
 
 add_library(IRRGUIOBJ OBJECT
+	CGUIButton.h
+	CGUICheckBox.h
+	CGUIComboBox.h
+	CGUIEditBox.h
+	CGUIEnvironment.h
+	CGUIFileOpenDialog.h
+	CGUIFont.h
+	CGUIImage.h
+	CGUIListBox.h
+	CGUIScrollBar.h
+	CGUISkin.h
+	CGUIStaticText.h
+	CGUITabControl.h
+	CGUISpriteBank.h
+	CGUIImageList.h
+
 	CGUIButton.cpp
 	CGUICheckBox.cpp
 	CGUIComboBox.cpp
@@ -507,8 +573,21 @@ add_library(IRRGUIOBJ OBJECT
 
 # Library
 
+file(GLOB_RECURSE IrrlichtMt_PUBLIC_HDRS "${CMAKE_CURRENT_SOURCE_DIR}/../include/*.h")
+
 # There have to be some sources in IrrlichtMt to workaround Cmake Xcode generator bug
-add_library(IrrlichtMt
+add_library(IrrlichtMt STATIC
+	${IrrlichtMt_PUBLIC_HDRS}
+
+	CBillboardSceneNode.h
+	CCameraSceneNode.h
+	CDummyTransformationSceneNode.h
+	CEmptySceneNode.h
+	CMeshManipulator.h
+	CSceneCollisionManager.h
+	CSceneManager.h
+	CMeshCache.h
+
 	CBillboardSceneNode.cpp
 	CCameraSceneNode.cpp
 	CDummyTransformationSceneNode.cpp
