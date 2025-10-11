@@ -11,11 +11,6 @@
 namespace irr
 {
 
-namespace io
-{
-class IReadFile;
-} // end namespace io
-
 namespace video
 {
 

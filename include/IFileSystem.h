@@ -9,10 +9,6 @@
 
 namespace irr
 {
-namespace video
-{
-class IVideoDriver;
-} // end namespace video
 namespace io
 {
 

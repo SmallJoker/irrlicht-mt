@@ -29,6 +29,11 @@
 namespace irr
 {
 
+namespace video
+{
+	class ITexture;
+}
+
 class CIrrDeviceLinux : public CIrrDeviceStub
 {
 public:

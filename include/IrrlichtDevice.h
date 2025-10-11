@@ -43,7 +43,6 @@ namespace video
 {
 class IContextManager;
 class IImage;
-class ITexture;
 class IVideoDriver;
 extern "C" IRRLICHT_API bool IRRCALLCONV isDriverSupported(E_DRIVER_TYPE driver);
 } // end namespace video
