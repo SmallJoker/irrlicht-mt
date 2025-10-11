@@ -190,6 +190,7 @@ protected:
 	s32 MarkBegin;
 	s32 MarkEnd;
 
+	video::SColor OverrideBgColor = 0;
 	video::SColor OverrideColor;
 	gui::IGUIFont *OverrideFont, *LastBreakFont;
 	IOSOperator *Operator;
@@ -205,7 +206,7 @@ protected:
 
 	bool WordWrap = false,
 		MultiLine = false,
-		AutoScroll = false,
+		AutoScroll = true,
 		PasswordBox = false,
 		IsWritable = true;
 
