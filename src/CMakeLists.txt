@@ -450,7 +450,6 @@ add_library(IRRIOOBJ OBJECT
 	CReadFile.cpp
 	CWriteFile.cpp
 	CZipReader.cpp
-	CAttributes.cpp
 )
 
 add_library(IRROTHEROBJ OBJECT

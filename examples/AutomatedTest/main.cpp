@@ -1,6 +1,5 @@
 #include <iostream>
 #include <irrlicht.h>
-#include "exampleHelper.h"
 #include <IFileSystem.h>
 #include <IAnimatedMeshSceneNode.h>
 #include <IGUIButton.h>
@@ -90,7 +89,13 @@ int main(int argc, char *argv[])
 	gui::IGUIEditBox *editbox = guienv->addEditBox(L"",
 			core::rect<s32>(10, 70, 60, 70 + 16));
 
-	const io::path mediaPath = getExampleMediaPath();
+	const io::path mediaPath = (
+#ifdef IRR_MOBILE_PATHS
+		io::path("media/")
+#else
+		io::path("../../media/")
+#endif
+	);
 
 	auto mesh_file = device->getFileSystem()->createAndOpenFile(mediaPath + "coolguy_opt.x");
 	check(mesh_file, "mesh file loading");
