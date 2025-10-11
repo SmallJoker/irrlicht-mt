@@ -377,7 +377,7 @@ bool CGUIEditBox::processKey(const SEvent &event)
 			}
 			break;
 		case KEY_INSERT:
-			if (!isEnabled())
+			if (!isEnabled() || !IsWritable)
 				break;
 
 			OverwriteMode = !OverwriteMode;
@@ -867,7 +867,7 @@ void CGUIEditBox::draw()
 		}
 
 		// draw cursor
-		if (isEnabled()) {
+		if (isEnabled() && IsWritable) {
 			if (WordWrap || MultiLine) {
 				cursorLine = getLineFromPos(CursorPos);
 				txtLine = &BrokenText[cursorLine];
@@ -1314,7 +1314,7 @@ void CGUIEditBox::inputChar(wchar_t c)
 
 void CGUIEditBox::inputString(const core::stringw &str)
 {
-	if (!isEnabled())
+	if (!isEnabled() || !IsWritable)
 		return;
 
 	core::stringw s;
