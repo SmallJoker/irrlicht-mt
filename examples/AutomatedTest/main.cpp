@@ -14,6 +14,7 @@ static IrrlichtDevice *device = nullptr;
 static int test_fail = 0;
 
 void test_irr_array();
+void test_irr_rcpointer();
 void test_irr_string();
 
 static video::E_DRIVER_TYPE chooseDriver(core::stringc arg_)
@@ -43,6 +44,7 @@ void run_unit_tests()
 	std::cout << "Running unit tests:" << std::endl;
 	try {
 		test_irr_array();
+		test_irr_rcpointer();
 		test_irr_string();
 	} catch (const std::exception &e) {
 		std::cerr << e.what() << std::endl;
