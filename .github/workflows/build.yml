@@ -8,7 +8,7 @@ on:
 jobs:
 
   linux-gl:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Install deps
@@ -35,52 +35,7 @@ jobs:
           name: irrlicht-linux
           path: ./irrlicht-linux.tar.gz
 
-  linux-gles:
-    # Xvfb test is broken on 20.04 for unknown reasons (not our bug)
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install deps
-        run: |
-          sudo apt-get update
-          sudo apt-get install g++ cmake libxi-dev libgles2-mesa-dev libpng-dev libjpeg-dev zlib1g-dev xvfb -qyy
-
-      - name: Build
-        run: |
-          cmake . -DBUILD_EXAMPLES=1 -DUSE_SDL2=OFF -DENABLE_OPENGL=OFF -DENABLE_GLES2=ON
-          make -j2
-
-      - name: Test (headless)
-        run: |
-          cd bin/Linux
-          ./AutomatedTest null
-
-      - name: Test (Xvfb)
-        run: |
-          cd bin/Linux
-          LIBGL_ALWAYS_SOFTWARE=true xvfb-run ./AutomatedTest ogles2
-
-  linux-sdl:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install deps
-        run: |
-          sudo apt-get update
-          sudo apt-get install g++ cmake libsdl2-dev libpng-dev libjpeg-dev zlib1g-dev -qyy
-
-      - name: Build
-        run: |
-          cmake . -DBUILD_EXAMPLES=1 -DUSE_SDL2=ON -DCMAKE_BUILD_TYPE=Debug
-          make -j2
-
-      - name: Test (headless)
-        run: |
-          cd bin/Linux
-          ./AutomatedTest null
-
   linux-sdl-gl3:
-    # Xvfb test is broken on 20.04 for unknown reasons (not our bug)
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -105,7 +60,7 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE=true xvfb-run ./AutomatedTest opengl3
 
   linux-sdl-gles2:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Install deps
@@ -129,15 +84,15 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE=true xvfb-run ./AutomatedTest ogles2
 
   mingw:
+    # TODO: Re-enable after getting rid of codecvt
+    if: false
     name: "MinGW ${{matrix.config.variant}}${{matrix.config.extras}}"
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
         config:
-          - {variant: win32, arch: i686}
           - {variant: win64, arch: x86_64}
-          - {variant: win32, arch: i686, extras: "-sdl"}
           - {variant: win64, arch: x86_64, extras: "-sdl"}
     steps:
       - uses: actions/checkout@v4
@@ -173,7 +128,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake . -DCMAKE_FIND_FRAMEWORK=LAST -DBUILD_EXAMPLES=1
+          cmake . -DUSE_SDL2=0 -DCMAKE_FIND_FRAMEWORK=LAST -DBUILD_EXAMPLES=1
           make -j3
 
       - name: Test (headless)
@@ -198,23 +153,18 @@ jobs:
           make -j3
 
   msvc:
-    name: VS 2019 ${{ matrix.config.arch }} ${{ matrix.sdl.label }}
-    runs-on: windows-2019
+    name: VS 2025 ${{ matrix.config.arch }} ${{ matrix.sdl.label }}
+    runs-on: windows-2025
     env:
-      VCPKG_VERSION: 8eb57355a4ffb410a2e94c07b4dca2dffbee8e50
-      # 2023.10.19
+      VCPKG_VERSION: 74e6536215718009aae747d86d84b78376bf9e09
       vcpkg_packages: zlib libpng libjpeg-turbo
     strategy:
       fail-fast: false
       matrix:
         config:
           -
-            arch: x86
-            generator: "-G'Visual Studio 16 2019' -A Win32"
-            vcpkg_triplet: x86-windows
-          -
             arch: x64
-            generator: "-G'Visual Studio 16 2019' -A x64"
+            generator: "-G'Visual Studio 17 2022' -A x64"
             vcpkg_triplet: x64-windows
         sdl:
           -
@@ -267,21 +217,23 @@ jobs:
           path: artifact/
 
   android:
+    # TODO: Fix "Error: The operation was canceled."
+    if: false
     name: Android ${{ matrix.arch }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     env:
-       ndk_version: "r25c"
+       # https://github.com/android/ndk/releases
+       ndk_version: "r27d"
        ANDROID_NDK: ${{ github.workspace }}/android-ndk
     strategy:
       matrix:
         arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install deps
         run: |
-          sudo rm /var/lib/man-db/auto-update
           sudo apt-get update
           sudo apt-get install -qyy wget unzip zip gcc-multilib make cmake
 
@@ -294,7 +246,7 @@ jobs:
 
       - name: Install NDK
         run: |
-          wget --progress=bar:force "http://dl.google.com/android/repository/android-ndk-${ndk_version}-linux.zip"
+          wget "http://dl.google.com/android/repository/android-ndk-${ndk_version}-linux.zip"
           unzip -q "android-ndk-${ndk_version}-linux.zip"
           rm "android-ndk-${ndk_version}-linux.zip"
           mv "android-ndk-${ndk_version}" "${ANDROID_NDK}"

@@ -1,9 +1,9 @@
 #!/bin/bash -e
 
-# NOTE: this code is mostly copied from minetest_android_deps
-# <https://github.com/minetest/minetest_android_deps>
+# NOTE: this code is mostly copied from luanti_android_deps
+# <https://github.com/luanti-org/luanti_android_deps/scripts>
 
-png_ver=1.6.40
+png_ver=1.6.50
 jpeg_ver=3.0.1
 
 download () {

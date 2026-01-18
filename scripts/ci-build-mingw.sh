@@ -9,10 +9,7 @@ with_sdl=0
 #with_gl3=0
 #[[ "$extras" == *"-gl3"* ]] && with_gl3=1
 
-libjpeg_version=3.0.1
-libpng_version=1.6.40
-sdl2_version=2.28.5
-zlib_version=1.3.1
+source $topdir/common.sh
 
 download () {
 	local url=$1
@@ -28,7 +25,7 @@ download () {
 libs=$PWD/libs
 mkdir -p libs
 pushd libs
-libhost="http://minetest.kitsunemimi.pw"
+libhost="https://minetest.kitsunemimi.pw"
 download "$libhost/llvm/libjpeg-$libjpeg_version-$variant.zip"
 download "$libhost/llvm/libpng-$libpng_version-$variant.zip"
 [ $with_sdl -eq 1 ] && download "$libhost/llvm/sdl2-$sdl2_version-$variant.zip"

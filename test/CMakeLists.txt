@@ -1,4 +1,12 @@
 link_libraries(IrrlichtMt::IrrlichtMt)
+
+if(MSVC)
+	add_compile_definitions(
+		# Get M_PI to work
+		_USE_MATH_DEFINES
+	)
+endif()
+
 add_executable(image_loader_test image_loader_test.cpp)
 
 function(test_image_loader format expected input)
