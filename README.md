@@ -16,8 +16,8 @@ The build system is CMake.
 The following libraries are required to be installed:
 
 * zlib, libPNG, libJPEG
-* OpenGL
-  * or on mobile: OpenGL ES (can be optionally enabled on desktop too)
+* OpenGL or OpenGL ES
+  * a headless build is possible, but not very useful
 * OS integration:
   * Either: SDL2 or SDL3 (recommended)
   * Or: X11 (Unix) if SDL is not used.
@@ -26,7 +26,7 @@ Aside from standard search options (`ZLIB_INCLUDE_DIR`, `ZLIB_LIBRARY`, ...) the
 
 * `BUILD_SHARED_LIBS` (default: `ON`) - Build IrrlichtMt as a shared library
 * `BUILD_EXAMPLES` (default: `OFF`) - Build example applications
-* `ENABLE_OPENGL` - Enable OpenGL driver
+* `ENABLE_OPENGL` - Enable legacy OpenGL driver
 * `ENABLE_OPENGL3` - Enable OpenGL 3+ driver
 * `ENABLE_GLES2` - Enable OpenGL ES 2+ driver
 * `USE_SDL2` (default: `OFF`) - Use SDL2 instead of older native device code
