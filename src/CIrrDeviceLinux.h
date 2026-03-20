@@ -74,9 +74,6 @@ public:
 	//! Checks if the Irrlicht device supports touch events.
 	bool supportsTouchEvents() const override;
 
-	//! returns color format of the window.
-	video::ECOLOR_FORMAT getColorFormat() const override;
-
 	//! notifies the device that it should close itself
 	void closeDevice() override;
 

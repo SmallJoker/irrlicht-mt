@@ -1198,18 +1198,6 @@ bool CIrrDeviceLinux::supportsTouchEvents() const
 #endif
 }
 
-
-//! returns color format of the window.
-video::ECOLOR_FORMAT CIrrDeviceLinux::getColorFormat() const
-{
-#ifdef _IRR_COMPILE_WITH_X11_
-	if (VisualInfo && (VisualInfo->depth != 16))
-		return video::ECF_R8G8B8;
-	else
-#endif
-		return video::ECF_R5G6B5;
-}
-
 //! Sets if the window should be resizable in windowed mode.
 void CIrrDeviceLinux::setResizable(bool resize)
 {
