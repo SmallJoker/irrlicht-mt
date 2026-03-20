@@ -98,7 +98,6 @@ protected:
 
 	bool Alpha;
 	bool Blending;
-	bool AlphaTest;
 
 	struct SUniformInfo
 	{
