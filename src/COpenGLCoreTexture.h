@@ -117,8 +117,7 @@ public:
 		}
 
 		if (HasMipMaps) {
-			for (size_t i = 0; i < tmpImages->size(); ++i)
-				regenerateMipMapLevels(i);
+			regenerateMipMapLevels();
 		}
 
 		if (!KeepImage) {
@@ -391,7 +390,7 @@ public:
 		LockLayer = 0;
 	}
 
-	void regenerateMipMapLevels(u32 layer = 0) override
+	void regenerateMipMapLevels() override
 	{
 		if (!HasMipMaps || (Size.Width <= 1 && Size.Height <= 1))
 			return;
