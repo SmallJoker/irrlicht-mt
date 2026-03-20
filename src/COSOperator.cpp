@@ -33,8 +33,6 @@
 #import <Cocoa/Cocoa.h>
 #endif
 
-#include "fast_atof.h"
-
 namespace irr
 {
 
