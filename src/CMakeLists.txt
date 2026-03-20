@@ -75,6 +75,7 @@ elseif(MSVC)
 	add_compile_definitions(
 		# Suppress some useless warnings
 		_CRT_SECURE_NO_DEPRECATE
+		_CRT_SECURE_NO_WARNINGS
 		# Get M_PI to work
 		_USE_MATH_DEFINES
 		# Don't define min/max macros in minwindef.h
@@ -130,23 +131,13 @@ elseif(ANDROID)
 	endif()
 elseif(EMSCRIPTEN)
 	add_compile_definitions(_IRR_EMSCRIPTEN_PLATFORM_ _IRR_COMPILE_WITH_EGL_MANAGER_)
-	set(LINUX_PLATFORM TRUE)
 	set(DEVICE "SDL")
 elseif(SOLARIS)
 	add_compile_definitions(_IRR_SOLARIS_PLATFORM_ _IRR_POSIX_API_)
 	set(DEVICE "X11")
 else()
 	add_compile_definitions(_IRR_POSIX_API_)
-	set(LINUX_PLATFORM TRUE)
 	set(DEVICE "X11")
-endif()
-
-if(LINUX_PLATFORM)
-	add_compile_definitions(_IRR_LINUX_PLATFORM_)
-endif()
-
-if(MSVC)
-	add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 endif()
 
 if(USE_SDL2 OR USE_SDL3)
@@ -676,9 +667,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	target_compile_definitions(IrrlichtMt INTERFACE _DEBUG)
 endif()
 target_compile_definitions(IrrlichtMt INTERFACE "IRRLICHT_API=${API_IMPORT}")
-if(APPLE OR ANDROID OR EMSCRIPTEN)
-	target_compile_definitions(IrrlichtMt PUBLIC IRR_MOBILE_PATHS)
-endif()
 
 set_target_properties(IrrlichtMt PROPERTIES
 	VERSION ${PROJECT_VERSION}

@@ -47,11 +47,7 @@ struct SIrrlichtCreationParameters
 #endif
 			SDK_version_do_not_use(IRRLICHT_SDK_VERSION),
 			PrivateData(0),
-#ifdef IRR_MOBILE_PATHS
-			OGLES2ShaderPath("media/Shaders/"),
-#else
-			OGLES2ShaderPath("../../media/Shaders/"),
-#endif
+			OGLES2ShaderPath("SHADER_PATH_WAS_NOT_SET"),
 			DriverDebug(false)
 	{
 	}
