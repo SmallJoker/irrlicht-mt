@@ -199,8 +199,8 @@ union FloatIntUnion32
 	// Portable sign-extraction
 	bool sign() const { return (i >> 31) != 0; }
 
-	irr::s32 i;
-	irr::f32 f;
+	s32 i;
+	f32 f;
 };
 
 //! We compare the difference in ULP's (spacing between floating-point numbers, aka ULP=1 means there exists no float between).

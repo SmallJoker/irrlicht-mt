@@ -130,8 +130,8 @@ int main(int argc, char *argv[])
 			++n;
 			if (n == 1) { // Tooltip display
 				bzero(&event, sizeof(SEvent));
-				event.EventType = irr::EET_MOUSE_INPUT_EVENT;
-				event.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
+				event.EventType = EET_MOUSE_INPUT_EVENT;
+				event.MouseInput.Event = EMIE_MOUSE_MOVED;
 				event.MouseInput.X = button->getAbsolutePosition().getCenter().X;
 				event.MouseInput.Y = button->getAbsolutePosition().getCenter().Y;
 				device->postEventFromUser(event);
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
 				guienv->setFocus(editbox);
 			else if (n == 3) { // Keypress for Text input
 				bzero(&event, sizeof(SEvent));
-				event.EventType = irr::EET_KEY_INPUT_EVENT;
+				event.EventType = EET_KEY_INPUT_EVENT;
 				event.KeyInput.Char = L'a';
 				event.KeyInput.Key = KEY_KEY_A;
 				event.KeyInput.PressedDown = true;

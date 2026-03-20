@@ -976,13 +976,13 @@ wchar_t CGUIEditBox::getCursorChar() const
 }
 
 //! Set the blinktime for the cursor. 2x blinktime is one full cycle.
-void CGUIEditBox::setCursorBlinkTime(irr::u32 timeMs)
+void CGUIEditBox::setCursorBlinkTime(u32 timeMs)
 {
 	CursorBlinkTime = timeMs;
 }
 
 //! Get the cursor blinktime
-irr::u32 CGUIEditBox::getCursorBlinkTime() const
+u32 CGUIEditBox::getCursorBlinkTime() const
 {
 	return CursorBlinkTime;
 }
@@ -1119,7 +1119,7 @@ bool CGUIEditBox::processMouse(const SEvent &event)
 
 		// paste from the primary selection
 		inputString([&] {
-			irr::core::stringw inserted_text;
+			core::stringw inserted_text;
 			if (!Operator)
 				return inserted_text;
 			const c8 *inserted_text_utf8 = Operator->getTextFromPrimarySelection();
@@ -1459,7 +1459,7 @@ void CGUIEditBox::calculateScrollPos()
 	{
 		// get cursor position
 		// get cursor area
-		irr::u32 cursorWidth = font->getDimension(CursorChar.c_str()).Width;
+		u32 cursorWidth = font->getDimension(CursorChar.c_str()).Width;
 		core::stringw *txtLine = hasBrokenText ? &BrokenText[cursLine] : &Text;
 		s32 cPos = hasBrokenText ? CursorPos - BrokenTextPositions[cursLine] : CursorPos; // column
 		s32 cStart = font->getDimension(txtLine->subString(0, cPos).c_str()).Width;       // pixels from text-start
@@ -1490,9 +1490,9 @@ void CGUIEditBox::calculateScrollPos()
 
 	// calculate vertical scrolling
 	if (hasBrokenText) {
-		irr::u32 lineHeight = font->getDimension(L"A").Height + font->getKerning(L'A').Y;
+		u32 lineHeight = font->getDimension(L"A").Height + font->getKerning(L'A').Y;
 		// only up to 1 line fits?
-		if (lineHeight >= (irr::u32)FrameRect.getHeight()) {
+		if (lineHeight >= (u32)FrameRect.getHeight()) {
 			VScrollPos = 0;
 			setTextRect(cursLine);
 			s32 unscrolledPos = CurrentTextRect.UpperLeftCorner.Y;

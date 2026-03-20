@@ -188,7 +188,7 @@ void CGUISpriteBank::draw2DSpriteBatch(const core::array<u32> &indices,
 		u32 starttime, u32 currenttime,
 		bool loop, bool center)
 {
-	const irr::u32 drawCount = core::min_<u32>(indices.size(), pos.size());
+	const u32 drawCount = core::min_<u32>(indices.size(), pos.size());
 
 	if (!getTextureCount())
 		return;

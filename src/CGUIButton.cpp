@@ -411,7 +411,7 @@ video::SColor CGUIButton::getOverrideColor() const
 	return OverrideColor;
 }
 
-irr::video::SColor CGUIButton::getActiveColor() const
+video::SColor CGUIButton::getActiveColor() const
 {
 	if (OverrideColorEnabled)
 		return OverrideColor;

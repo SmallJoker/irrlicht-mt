@@ -1336,7 +1336,7 @@ bool CXMeshFileLoader::parseDataObjectAnimationTicksPerSecond()
 		SET_ERR_AND_RETURN();
 	}
 
-	AnimatedMesh->setAnimationSpeed(static_cast<irr::f32>(ticks));
+	AnimatedMesh->setAnimationSpeed(static_cast<f32>(ticks));
 
 	return true;
 }

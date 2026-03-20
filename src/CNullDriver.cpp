@@ -366,7 +366,7 @@ ITexture *CNullDriver::addTextureCubemap(const io::path &name, IImage *imagePosX
 	return t;
 }
 
-ITexture *CNullDriver::addTextureCubemap(const irr::u32 sideLen, const io::path &name, ECOLOR_FORMAT format)
+ITexture *CNullDriver::addTextureCubemap(const u32 sideLen, const io::path &name, ECOLOR_FORMAT format)
 {
 	if (0 == sideLen)
 		return 0;
@@ -640,7 +640,7 @@ void CNullDriver::draw2DImageBatch(const video::ITexture *texture,
 		SColor color,
 		bool useAlphaChannelOfTexture)
 {
-	const irr::u32 drawCount = core::min_<u32>(positions.size(), sourceRects.size());
+	const u32 drawCount = core::min_<u32>(positions.size(), sourceRects.size());
 
 	for (u32 i = 0; i < drawCount; ++i) {
 		draw2DImage(texture, positions[i], sourceRects[i],
@@ -1671,7 +1671,7 @@ ITexture *CNullDriver::addRenderTargetTextureMs(const core::dimension2d<u32> &si
 	return 0;
 }
 
-ITexture *CNullDriver::addRenderTargetTextureCubemap(const irr::u32 sideLen,
+ITexture *CNullDriver::addRenderTargetTextureCubemap(const u32 sideLen,
 		const io::path &name, const ECOLOR_FORMAT format)
 {
 	return 0;
@@ -1738,7 +1738,7 @@ void CNullDriver::enableMaterial2D(bool enable)
 	OverrideMaterial2DEnabled = enable;
 }
 
-bool CNullDriver::needsTransparentRenderPass(const irr::video::SMaterial &material) const
+bool CNullDriver::needsTransparentRenderPass(const video::SMaterial &material) const
 {
 	// TODO: I suspect it would be nice if the material had an enum for further control.
 	//		Especially it probably makes sense to allow disabling transparent render pass as soon as material.ZWriteEnable is on.

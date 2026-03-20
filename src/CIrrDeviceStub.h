@@ -162,7 +162,7 @@ public:
 	float getDisplayDensity() const override;
 
 	//! Resize the render window.
-	void setWindowSize(const irr::core::dimension2d<u32> &size) override {}
+	void setWindowSize(const core::dimension2d<u32> &size) override {}
 
 protected:
 	void createGUIAndScene();

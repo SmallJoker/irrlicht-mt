@@ -430,7 +430,7 @@ void COpenGL3DriverBase::createMaterialRenderers()
 	delete[] fs2DData;
 }
 
-bool COpenGL3DriverBase::setMaterialTexture(irr::u32 layerIdx, const irr::video::ITexture *texture)
+bool COpenGL3DriverBase::setMaterialTexture(u32 layerIdx, const video::ITexture *texture)
 {
 	Material.TextureLayers[layerIdx].Texture = const_cast<ITexture *>(texture); // function uses const-pointer for texture because all draw functions use const-pointers already
 	return CacheHandler->getTextureCache().set(0, texture);
@@ -849,7 +849,7 @@ void COpenGL3DriverBase::draw2DImageBatch(const video::ITexture *texture,
 				clipRect->getWidth(), clipRect->getHeight());
 	}
 
-	const irr::u32 drawCount = core::min_<u32>(positions.size(), sourceRects.size());
+	const u32 drawCount = core::min_<u32>(positions.size(), sourceRects.size());
 	assert(6 * drawCount * sizeof(u16) <= QuadIndexVBO.getSize()); // FIXME split the batch? or let it crash?
 
 	std::vector<S3DVertex> vtx;
@@ -1906,7 +1906,7 @@ bool COpenGL3DriverBase::queryTextureFormat(ECOLOR_FORMAT format) const
 	return TextureFormats[format].InternalFormat != 0;
 }
 
-bool COpenGL3DriverBase::needsTransparentRenderPass(const irr::video::SMaterial &material) const
+bool COpenGL3DriverBase::needsTransparentRenderPass(const video::SMaterial &material) const
 {
 	return CNullDriver::needsTransparentRenderPass(material) || material.isAlphaBlendOperation();
 }

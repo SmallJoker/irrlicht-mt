@@ -87,7 +87,7 @@ public:
 	{
 		if (Vertices->getCount()) {
 			BoundingBox.reset(Vertices->getPosition(0));
-			const irr::u32 vsize = Vertices->getCount();
+			const u32 vsize = Vertices->getCount();
 			for (u32 i = 1; i < vsize; ++i)
 				BoundingBox.addInternalPoint(Vertices->getPosition(i));
 		} else
