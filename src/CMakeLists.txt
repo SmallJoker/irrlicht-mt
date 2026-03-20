@@ -262,12 +262,15 @@ find_package(ZLIB REQUIRED)
 find_package(JPEG REQUIRED)
 find_package(PNG REQUIRED)
 
-if(ENABLE_GLES2)
-	find_package(OpenGLES2 REQUIRED)
-endif()
-if(ENABLE_OPENGL)
+if(OPENGL_DIRECT_LINK)
 	find_package(OpenGL REQUIRED)
 endif()
+
+if(EMSCRIPTEN)
+	find_path(EGL_INCLUDE_DIR EGL/egl.h)
+	find_library(EGL_LIBRARY NAMES EGL)
+endif()
+
 set(USE_SDL2_SHARED FALSE)
 if(USE_SDL3)
 	set(USE_SDL2_STATIC FALSE) # do not attempt to link against SDL2
@@ -364,7 +367,6 @@ set(link_includes
 	"$<$<NOT:$<BOOL:${USE_SDL3}>>:${SDL2_INCLUDE_DIRS}>"
 
 	${OPENGL_INCLUDE_DIR}
-	${OPENGLES2_INCLUDE_DIR}
 	${EGL_INCLUDE_DIR}
 
 	"$<$<BOOL:${USE_X11}>:${X11_INCLUDE_DIR}>"
