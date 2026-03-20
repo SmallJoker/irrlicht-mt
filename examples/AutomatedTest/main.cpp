@@ -1,7 +1,7 @@
 #include <iostream>
 #include <irrlicht.h>
 #include <IFileSystem.h>
-#include <IAnimatedMeshSceneNode.h>
+#include <AnimatedMeshSceneNode.h>
 #include <IGUIButton.h>
 #include <IGUIEditBox.h>
 #include <IGUIEnvironment.h>
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 	if (mesh) {
 		video::ITexture *tex = driver->getTexture(mediaPath + "cooltexture.png");
 		check(tex, "texture loading");
-		scene::IAnimatedMeshSceneNode *node = smgr->addAnimatedMeshSceneNode(mesh);
+		scene::AnimatedMeshSceneNode *node = smgr->addAnimatedMeshSceneNode(mesh);
 		if (node) {
 			node->forEachMaterial([tex](video::SMaterial &mat) {
 				mat.setTexture(0, tex);

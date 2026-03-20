@@ -73,7 +73,7 @@ enum E_SCENE_NODE_RENDER_PASS
 };
 
 class IAnimatedMesh;
-class IAnimatedMeshSceneNode;
+class AnimatedMeshSceneNode;
 class IBillboardSceneNode;
 class ICameraSceneNode;
 class IDummyTransformationSceneNode;
@@ -135,7 +135,7 @@ public:
 	\param alsoAddIfMeshPointerZero: Add the scene node even if a 0 pointer is passed.
 	\return Pointer to the created scene node.
 	This pointer should not be dropped. See IReferenceCounted::drop() for more information. */
-	virtual IAnimatedMeshSceneNode *addAnimatedMeshSceneNode(IAnimatedMesh *mesh,
+	virtual AnimatedMeshSceneNode *addAnimatedMeshSceneNode(IAnimatedMesh *mesh,
 			ISceneNode *parent = 0, s32 id = -1,
 			const core::vector3df &position = core::vector3df(0, 0, 0),
 			const core::vector3df &rotation = core::vector3df(0, 0, 0),
