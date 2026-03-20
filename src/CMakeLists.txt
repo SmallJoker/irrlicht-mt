@@ -1,11 +1,15 @@
+option(BUILD_SHARED_LIBS "Build shared library" TRUE)
+
 # When enabling SDL2 by default on macOS, don't forget to change
 # "NSHighResolutionCapable" to true in "Info.plist".
-set(DEFAULT_SDL2 ON)
+set(DEFAULT_SDL2 OFF)
+set(DEFAULT_SDL3 ON)
 
-option(BUILD_SHARED_LIBS "Build shared library" TRUE)
 option(USE_SDL2 "Use the SDL2 backend" ${DEFAULT_SDL2})
-
 option(USE_SDL2_STATIC "Link with SDL2 static libraries" FALSE)
+
+option(USE_SDL3 "Use the SDL3 backend instead of SDL2" ${DEFAULT_SDL3})
+option(USE_SDL3_STATIC "Link with SDL3 static libraries" FALSE)
 
 # Compiler flags
 
@@ -145,7 +149,7 @@ if(MSVC)
 	add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 endif()
 
-if(USE_SDL2)
+if(USE_SDL2 OR USE_SDL3)
 	set(DEVICE "SDL")
 elseif(DEVICE STREQUAL "SDL")
 	message(FATAL_ERROR "SDL was used but not enabled?!")
@@ -229,8 +233,8 @@ if(ENABLE_OPENGL3)
 		# supported
 	elseif(DEVICE STREQUAL "X11")
 		# supported
-	elseif (NOT USE_SDL2)
-		message(FATAL_ERROR "OpenGL 3 driver requires SDL2")
+	elseif (NOT USE_SDL2 AND NOT USE_SDL3)
+		message(FATAL_ERROR "OpenGL 3 driver requires SDL")
 	endif()
 endif()
 
@@ -278,7 +282,23 @@ if(ENABLE_OPENGL)
 	find_package(OpenGL REQUIRED)
 endif()
 set(USE_SDL2_SHARED FALSE)
-if(USE_SDL2)
+if(USE_SDL3)
+	set(USE_SDL2_STATIC FALSE) # do not attempt to link against SDL2
+
+	# https://wiki.libsdl.org/SDL3/README-cmake#a-system-sdl-library
+	if(USE_SDL3_STATIC)
+		set(SDL3_SUFFIX "static")
+	else()
+		set(SDL3_SUFFIX "shared")
+	endif()
+	find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3-${SDL3_SUFFIX})
+	message(STATUS "Found SDL3: ${SDL3_VERSION} (${SDL3_SUFFIX} library)")
+
+	# https://github.com/libsdl-org/SDL/blob/release-3.2.x/include/SDL3/SDL_opengl_glext.h#L2859
+	set(USE_SDL_OPENGL_4_5_HEADER TRUE)
+elseif(USE_SDL2)
+	# Fall back to SDL2
+
 	if(NOT USE_SDL2_STATIC)
 		set(USE_SDL2_SHARED TRUE)
 	endif()
@@ -311,21 +331,24 @@ endif()
 
 # More special config
 
-if(ENABLE_OPENGL AND DEVICE STREQUAL "SDL")
-	# The legacy GL driver requires some symbols from GL 4.5 to compile,
-	# which SDL only provides since 2.26.0 (Nov 2022).
-	# We have a fallback in case this isn't satisfied so test for it.
+if(USE_SDL2 AND ENABLE_OPENGL)
 	set(CMAKE_REQUIRED_INCLUDES ${SDL2_INCLUDE_DIRS})
-	unset(CHECK_GL_VERSION_4_5 CACHE)
+	unset(USE_SDL_OPENGL_4_5_HEADER CACHE) # Why?
 	check_cxx_source_compiles("#include <SDL_opengl.h>\n\
 #ifndef GL_VERSION_4_5\n\
 #error\n\
 #endif\n\
-int main() {}" CHECK_GL_VERSION_4_5)
-	if(CHECK_GL_VERSION_4_5)
-		add_compile_definitions(IRR_PREFER_SDL_GL_HEADER)
-	endif()
+int main() {}" USE_SDL_OPENGL_4_5_HEADER)
 endif()
+
+if(USE_SDL_OPENGL_4_5_HEADER)
+	# The legacy GL driver requires some symbols from GL 4.5 to compile,
+	# which SDL only provides since 2.26.0 (Nov 2022).
+	# We have a fallback in case this isn't satisfied so test for it.
+	add_compile_definitions(IRR_PREFER_SDL_GL_HEADER)
+	message(STATUS "Using SDL OpenGL header")
+endif()
+
 
 # Platform-specific libs
 
@@ -351,7 +374,7 @@ set(link_includes
 	"${ZLIB_INCLUDE_DIR}"
 	"${JPEG_INCLUDE_DIR}"
 	"${PNG_INCLUDE_DIR}"
-	"$<$<BOOL:${USE_SDL2}>:${SDL2_INCLUDE_DIRS}>"
+	"$<$<NOT:$<BOOL:${USE_SDL3}>>:${SDL2_INCLUDE_DIRS}>"
 
 	${OPENGL_INCLUDE_DIR}
 	${OPENGLES2_INCLUDE_DIR}
@@ -533,6 +556,12 @@ endif()
 if(USE_XCURSOR)
 	target_compile_definitions(IRROTHEROBJ PRIVATE _IRR_LINUX_XCURSOR_)
 endif()
+ 
+if(USE_SDL3)
+	include_directories(IRROTHEROBJ $<TARGET_PROPERTY:SDL3::Headers,INTERFACE_INCLUDE_DIRECTORIES>)
+	target_compile_definitions(IRROTHEROBJ PRIVATE _IRR_USE_SDL3_)
+	target_compile_definitions(IRRVIDEOOBJ PRIVATE _IRR_USE_SDL3_) # OpenGL/Common.h
+endif()
 
 add_library(IRRGUIOBJ OBJECT
 	CGUIButton.h
@@ -627,6 +656,8 @@ target_link_libraries(IrrlichtMt PRIVATE
 	${PNG_LIBRARY}
 	"$<$<BOOL:${USE_SDL2_SHARED}>:SDL2::SDL2>"
 	"$<$<BOOL:${USE_SDL2_STATIC}>:SDL2::SDL2-static>"
+
+	"$<$<BOOL:${USE_SDL3}>:SDL3::SDL3-${SDL3_SUFFIX}>"
 
 	"$<$<BOOL:${OPENGL_DIRECT_LINK}>:${OPENGL_LIBRARIES}>"
 	${EGL_LIBRARY}

@@ -18,17 +18,19 @@ The following libraries are required to be installed:
 * zlib, libPNG, libJPEG
 * OpenGL
   * or on mobile: OpenGL ES (can be optionally enabled on desktop too)
-* on Unix: X11
-* SDL2 (see below)
+* OS integration:
+  * Either: SDL2 or SDL3 (recommended)
+  * Or: X11 (Unix) if SDL is not used.
 
 Aside from standard search options (`ZLIB_INCLUDE_DIR`, `ZLIB_LIBRARY`, ...) the following options are available:
 
 * `BUILD_SHARED_LIBS` (default: `ON`) - Build IrrlichtMt as a shared library
 * `BUILD_EXAMPLES` (default: `OFF`) - Build example applications
 * `ENABLE_OPENGL` - Enable OpenGL driver
-* `ENABLE_OPENGL3` (default: `OFF`) - Enable OpenGL 3+ driver
+* `ENABLE_OPENGL3` - Enable OpenGL 3+ driver
 * `ENABLE_GLES2` - Enable OpenGL ES 2+ driver
-* `USE_SDL2` (default: platform-dependent, usually `ON`) - Use SDL2 instead of older native device code
+* `USE_SDL2` (default: `OFF`) - Use SDL2 instead of older native device code
+* `USE_SDL3` (default: `ON`) - Use the SDL3 device instead of SDL2
 
 Note: if `zconf.h` cannot be found due to separate (out-of-tree) build directories,
 do specify two paths in the same CMake option. e.g. `/path/to/zlib;/path/to/zlib_build`.
@@ -87,7 +89,7 @@ Driver (rows) vs Device (columns)
 
 Notes:
 
-* [1] `CIrrDeviceSDL`: supports Android, Linux, macOS, Windows
+* [1] `CIrrDeviceSDL`: supports [many platforms](https://wiki.libsdl.org/SDL3/README-platforms)
 * [2] `CIrrDeviceLinux`: supports Linux
 * [3] `CIrrDeviceOSX`: supports macOS
 * [4] `CIrrDeviceWin32`: supports Windows
