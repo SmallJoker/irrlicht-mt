@@ -52,6 +52,13 @@ public:
 
 	void reset(T *obj = nullptr) { reset_rc(obj); }
 
+	T *release()
+	{
+		T *val = get();
+		Obj = nullptr;
+		return val;
+	}
+
 	T *get() const { return dynamic_cast<T *>(Obj); }
 	// Automatic type conversion
 	explicit operator T*() const { return dynamic_cast<T *>(Obj); }
