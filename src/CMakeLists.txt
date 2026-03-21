@@ -1,5 +1,8 @@
 option(BUILD_SHARED_LIBS "Build shared library" TRUE)
 
+include(CheckCXXSourceCompiles)
+include(CheckCXXCompilerFlag)
+
 # When enabling SDL2 by default on macOS, don't forget to change
 # "NSHighResolutionCapable" to true in "Info.plist".
 set(DEFAULT_SDL2 OFF)
@@ -58,10 +61,15 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang|AppleClang)$")
 		add_compile_options(-Wall -pipe)
 	endif()
 
+	# if possible, error on struct/class keyword missmatch
+	check_cxx_compiler_flag("-Werror=mismatched-tags" SUPPORTS_W_MISMATCHED_TAGS)
+	if(SUPPORTS_W_MISMATCHED_TAGS)
+		add_compile_options("-Werror=mismatched-tags")
+	endif()
+
 	# Enable SSE for floating point math on 32-bit x86 by default
 	# reasoning see minetest issue #11810 and https://gcc.gnu.org/wiki/FloatingPointMath
 	if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-		include(CheckCXXSourceCompiles)
 		check_cxx_source_compiles("#ifndef __i686__\n#error\n#endif\nint main(){}" IS_I686)
 		if(IS_I686)
 			message(STATUS "Detected Intel x86: using SSE instead of x87 FPU")
@@ -95,7 +103,6 @@ endif()
 
 # Sanity-check version
 
-include(CheckCXXSourceCompiles)
 set(CMAKE_REQUIRED_INCLUDES ${PROJECT_SOURCE_DIR}/include)
 unset(REVISION_SANITY_CHECK CACHE)
 check_cxx_source_compiles("#include <IrrCompileConfig.h>\n\
