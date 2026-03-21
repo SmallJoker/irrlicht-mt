@@ -14,6 +14,7 @@ static const char *const copyright = "Irrlicht Engine (c) 2002-2017 Nikolaus Geb
 #include "irrlicht.h"
 #include "matrix4.h"
 #include "SMaterial.h"
+#include "os.h"
 
 #ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
 #include "CIrrDeviceWin32.h"
@@ -68,6 +69,23 @@ extern "C" IRRLICHT_API IrrlichtDevice *IRRCALLCONV createDeviceEx(const SIrrlic
 	}
 
 	return dev;
+}
+
+extern "C" IRRLICHT_API void showErrorMessageBox(IrrlichtDevice *dev,
+	const char *title, const char *message)
+{
+	title = title ? title : "Irrlicht";
+	bool ok = false;
+#ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
+	if (dev && dev->getType() == EIDT_SDL) {
+		ok = static_cast<CIrrDeviceSDL*>(dev)->showErrorMessageBox(title, message);
+	} else {
+		ok = CIrrDeviceSDL::showErrorMessageBox(nullptr, title, message);
+	}
+#endif
+	if (!ok) {
+		os::Printer::log(title, message, ELL_ERROR);
+	}
 }
 
 namespace core
