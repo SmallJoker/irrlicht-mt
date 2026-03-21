@@ -396,7 +396,7 @@ SkinnedMesh *SkinnedMeshBuilder::finalize() &&
 		auto *buf = mesh->LocalBuffers.at(weight.buffer_id);
 		auto *weights = buf->getWeights();
 		if (!weights) {
-			buf->setWeights(WeightBuffer(buf->getVertexCount()));
+			buf->setWeights(buf->getVertexCount());
 			weights = buf->getWeights();
 		}
 		weights->addWeight(weight.vertex_id, weight.joint_id, weight.strength);
