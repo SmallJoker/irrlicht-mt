@@ -13,6 +13,8 @@ namespace irr
 namespace scene
 {
 
+struct WeightBuffer;
+
 class IVertexBuffer : public virtual IReferenceCounted
 {
 public:
