@@ -10,6 +10,7 @@
 #include "HWBuffer.h"
 #include "IVertexBuffer.h"
 #include "WeightBuffer.h"
+#include "irrPtr.h"
 
 namespace irr
 {
@@ -83,11 +84,26 @@ struct CVertexBuffer final : public IVertexBuffer
 		return Data[i].TCoords;
 	}
 
+	const WeightBuffer *getWeightBuffer() const override
+	{
+		return UseSwSkinning ? nullptr : Weights.get();
+	}
+
+	void useSwSkinning() override
+	{
+		if (Weights.get() || UseSwSkinning)
+			return;
+		UseSwSkinning = true;
+		MappingHint = EHM_STREAM;
+		Weights->updateStaticPose(this);
+	}
+
 	//! Vertices of this buffer
 	std::vector<T> Data;
 
 	//! Optional weights for skinning
-	std::unique_ptr<WeightBuffer> Weights;
+	irr_ptr<WeightBuffer> Weights;
+	bool UseSwSkinning = false;
 };
 
 //! Standard buffer

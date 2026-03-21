@@ -291,6 +291,12 @@ protected:
 	//! Same as `CacheHandler->setViewport`, but also sets `ViewPort`
 	virtual void setViewPortRaw(u32 width, u32 height);
 
+	virtual u16 getMaxJointTransforms() const override
+	{
+		return MaxJointTransforms;
+	}
+	virtual void setJointTransforms(const std::vector<core::matrix4> &jointMatrices) override;
+
 	void drawQuad(const VertexType &vertexType, const S3DVertex (&vertices)[4]);
 	void drawArrays(GLenum primitiveType, const VertexType &vertexType, const void *vertices, int vertexCount);
 	void drawElements(GLenum primitiveType, const VertexType &vertexType, const void *vertices, int vertexCount, const u16 *indices, int indexCount);
@@ -352,6 +358,10 @@ private:
 
 	OpenGLVBO QuadIndexVBO;
 	void initQuadsIndices(u32 max_vertex_count = 65536);
+
+	u16 MaxJointTransforms = 0;
+	void initMaxJointTransforms();
+	OpenGLVBO JointTransformsUBO;
 
 	void debugCb(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message);
 	static void APIENTRY debugCb(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam);
