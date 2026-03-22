@@ -91,7 +91,7 @@ struct CVertexBuffer final : public IVertexBuffer
 
 	void useSwSkinning() override
 	{
-		if (Weights.get() || UseSwSkinning)
+		if (!Weights || UseSwSkinning)
 			return;
 		UseSwSkinning = true;
 		MappingHint = EHM_STREAM;

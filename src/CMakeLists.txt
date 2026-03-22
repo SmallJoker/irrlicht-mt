@@ -14,6 +14,18 @@ option(USE_SDL2_STATIC "Link with SDL2 static libraries" FALSE)
 option(USE_SDL3 "Use the SDL3 backend instead of SDL2" ${DEFAULT_SDL3})
 option(USE_SDL3_STATIC "Link with SDL3 static libraries" FALSE)
 
+if(USE_SDL2 AND USE_SDL3)
+	message(WARNING "Enabled SDL2 and SDL3. Disabling SDL2.")
+	set(USE_SDL2 OFF)
+endif()
+
+if(USE_SDL2 OR USE_SDL3)
+	set(USE_SDL_ANY TRUE)
+else()
+	set(USE_SDL_ANY FALSE)
+endif()
+
+
 # Compiler flags
 
 add_definitions(-DIRRLICHT_EXPORTS)
@@ -34,32 +46,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 
-if(WIN32)
-	# Detect whether the build is run within Wine
-	execute_process(
-		COMMAND tasklist /NH /FI "ImageName eq winedevice.exe"
-		OUTPUT_VARIABLE TASKLIST_OUTPUT
-	)
-	string(REGEX MATCHALL "\n" TASKLIST_LINES "${TASKLIST_OUTPUT}")
-	string(LENGTH "${TASKLIST_LINES}" TASKLIST_LINES)
-	if(TASKLIST_LINES GREATER 2)
-		set(WINE 1)
-	endif()
-	unset(TASKLIST_OUTPUT)
-	unset(TASKLIST_LINES)
-endif()
-
 if(CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang|AppleClang)$")
 	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 	set(CMAKE_CXX_FLAGS_DEBUG "-g")
-
-	if(WINE)
-		# As of Wine 9.8, "-pipe" results in corrupted assembler output (junk instructions)
-		message(STATUS "Disabled -pipe option (Wine detected)")
-		add_compile_options(-Wall)
-	else()
-		add_compile_options(-Wall -pipe)
-	endif()
 
 	# if possible, error on struct/class keyword missmatch
 	check_cxx_compiler_flag("-Werror=mismatched-tags" SUPPORTS_W_MISMATCHED_TAGS)
@@ -133,21 +122,23 @@ elseif(APPLE)
 	set(DEVICE "OSX")
 elseif(ANDROID)
 	add_compile_definitions(_IRR_ANDROID_PLATFORM_)
-	if(NOT USE_SDL2)
-		message(FATAL_ERROR "The Android build requires SDL2")
+	if(NOT USE_SDL_ANY)
+		message(FATAL_ERROR "The Android build requires SDL2 or SDL3")
 	endif()
 elseif(EMSCRIPTEN)
 	add_compile_definitions(_IRR_EMSCRIPTEN_PLATFORM_ _IRR_COMPILE_WITH_EGL_MANAGER_)
+	set(LINUX_PLATFORM TRUE)
 	set(DEVICE "SDL")
 elseif(SOLARIS)
 	add_compile_definitions(_IRR_SOLARIS_PLATFORM_ _IRR_POSIX_API_)
 	set(DEVICE "X11")
 else()
 	add_compile_definitions(_IRR_POSIX_API_)
+	set(LINUX_PLATFORM TRUE)
 	set(DEVICE "X11")
 endif()
 
-if(USE_SDL2 OR USE_SDL3)
+if(USE_SDL_ANY)
 	set(DEVICE "SDL")
 elseif(DEVICE STREQUAL "SDL")
 	message(FATAL_ERROR "SDL was used but not enabled?!")
@@ -554,7 +545,7 @@ endif()
 if(USE_XCURSOR)
 	target_compile_definitions(IRROTHEROBJ PRIVATE _IRR_LINUX_XCURSOR_)
 endif()
- 
+
 if(USE_SDL3)
 	include_directories(IRROTHEROBJ $<TARGET_PROPERTY:SDL3::Headers,INTERFACE_INCLUDE_DIRECTORIES>)
 	target_compile_definitions(IRROTHEROBJ PRIVATE _IRR_USE_SDL3_)

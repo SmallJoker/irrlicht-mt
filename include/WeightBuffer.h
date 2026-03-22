@@ -9,6 +9,7 @@
 #include "matrix4.h"
 #include "IVertexBuffer.h"
 
+#include <array>
 #include <cassert>
 #include <memory>
 #include <optional>

@@ -4,10 +4,7 @@
 
 #pragma once
 
-#include "IReferenceCounted.h"
-
-// This is Arnie. It is a mechanical duck. It looks like a duck,
-// and quacks like a duck. Yet it is not a real duck.
+#include <type_traits> // is_base_of_v
 
 // Shared pointer class for IReferenceCounted classes (RAII).
 
@@ -16,14 +13,14 @@ namespace irr
 
 // https://www.geeksforgeeks.org/cpp/how-to-implement-user-defined-shared-pointers-in-c/
 
+class IReferenceCounted;
+
 template <typename T>
 class RcPointer {
 public:
-	RcPointer(IReferenceCounted *obj = nullptr) :
-		Obj(obj)
-	{
-		// No need to grab: is already 1.
-	}
+	/// This does NOT increase the reference count!
+	/// Use only when passing a newly constructed class.
+	RcPointer(T *obj = nullptr) : Obj(obj) {}
 
 	RcPointer(const RcPointer<T> &other)
 	{
@@ -40,6 +37,9 @@ public:
 
 	~RcPointer()
 	{
+		// In case of the compiler error 'non-constant condition for static assertion',
+		// do define the constructor AND destructor if your class in the source file.
+		static_assert(std::is_base_of_v<IReferenceCounted, T>, "");
 		reset_rc();
 	}
 
@@ -59,14 +59,16 @@ public:
 		return val;
 	}
 
-	T *get() const { return dynamic_cast<T *>(Obj); }
+	T *get() const { return Obj; }
 	// Automatic type conversion
-	explicit operator T*() const { return dynamic_cast<T *>(Obj); }
+	explicit operator T*() const { return Obj; }
 	// Member access
-	T *operator->() const { return dynamic_cast<T *>(Obj); }
+	T *operator->() const { return Obj; }
+
+	operator bool() const { return Obj; }
 
 private:
-	void reset_rc(IReferenceCounted *obj = nullptr)
+	void reset_rc(T *obj = nullptr)
 	{
 		if (Obj)
 			Obj->drop();
@@ -75,7 +77,7 @@ private:
 			Obj->grab();
 	}
 
-	IReferenceCounted *Obj;
+	T *Obj;
 };
 
 // Glue for backporting efforts

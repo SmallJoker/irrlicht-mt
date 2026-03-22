@@ -23,3 +23,6 @@ scripts/glext.h
 
 # vscode cmake plugin
 build/*
+
+# Rejected diff sections from backporting
+*.rej

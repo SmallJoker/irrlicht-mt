@@ -95,6 +95,20 @@ Notes:
 * [4] `CIrrDeviceWin32`: supports Windows
 
 
+### Minimal SDL3 configuration
+
+This library supports a few SDL3 features. The minimal CMake options are as follows:
+
+	-DSDL_VIDEO=1  -DSDL_JOYSTICK=1
+	-DSDL_AUDIO=0  -DSDL_GPU=0    -DSDL_RENDER=0  -DSDL_CAMERA=0
+	-DSDL_POWER=0  -DSDL_SENSOR=0 -DSDL_DIALOG=0
+	# Possibly supported in the future
+	-DSDL_HAPTIC=0  -DSDL_HIDAPI=0
+	# Optional / as desired
+	-DSDL_SHARED=1  -DSDL_TEST_LIBRARY=0
+	-DSDL_OPENGL=1  -DSDL_OPENGLES=1
+
+
 License
 -------
 

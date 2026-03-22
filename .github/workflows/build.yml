@@ -13,12 +13,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install deps
         run: |
-          sudo apt-get update
-          sudo apt-get install g++ cmake libxi-dev libgl1-mesa-dev libpng-dev libjpeg-dev zlib1g-dev -qyy
+          sudo apt update
+          sudo apt install -qyy g++ cmake libxi-dev libgl1-mesa-dev libpng-dev libjpeg-dev zlib1g-dev
 
       - name: Build
         run: |
-          cmake . -DUSE_SDL2=OFF
+          cmake . -DUSE_SDL3=0
           make VERBOSE=1 -j2
 
       - name: Test
@@ -41,12 +41,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install deps
         run: |
-          sudo apt-get update
-          sudo apt-get install g++ cmake libsdl2-dev libpng-dev libjpeg-dev zlib1g-dev xvfb -qyy
+          sudo apt update
+          sudo apt install -qyy g++ cmake libsdl2-dev libpng-dev libjpeg-dev zlib1g-dev xvfb
 
       - name: Build
         run: |
-          cmake . -DBUILD_EXAMPLES=1 -DUSE_SDL2=ON -DENABLE_OPENGL=OFF -DENABLE_OPENGL3=ON
+          cmake . -DUSE_SDL2=1 -DUSE_SDL3=0 -DENABLE_OPENGL=0 -DENABLE_OPENGL3=1 -DBUILD_EXAMPLES=1
           make -j2
 
       - name: Test (headless)
@@ -65,12 +65,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install deps
         run: |
-          sudo apt-get update
-          sudo apt-get install g++ cmake libsdl2-dev libpng-dev libjpeg-dev zlib1g-dev xvfb -qyy
+          sudo apt update
+          sudo apt install -qyy g++ cmake libsdl2-dev libpng-dev libjpeg-dev zlib1g-dev xvfb
 
       - name: Build
         run: |
-          cmake . -DBUILD_EXAMPLES=1 -DUSE_SDL2=ON -DENABLE_OPENGL=OFF -DENABLE_GLES2=ON
+          cmake . -DUSE_SDL2=1 -DUSE_SDL3=0 -DENABLE_OPENGL=0 -DENABLE_GLES2=1 -DBUILD_EXAMPLES=1
           make -j2
 
       - name: Test (headless)
@@ -128,7 +128,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake . -DUSE_SDL2=0 -DCMAKE_FIND_FRAMEWORK=LAST -DBUILD_EXAMPLES=1
+          cmake . -DUSE_SDL2=0 -DUSE_SDL3=0 -DCMAKE_FIND_FRAMEWORK=LAST -DBUILD_EXAMPLES=1
           make -j3
 
       - name: Test (headless)
@@ -149,7 +149,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake . -DCMAKE_FIND_FRAMEWORK=LAST -DBUILD_EXAMPLES=1 -DUSE_SDL2=1
+          cmake . -DUSE_SDL2=1 -DUSE_SDL3=0 -DCMAKE_FIND_FRAMEWORK=LAST -DBUILD_EXAMPLES=1
           make -j3
 
   msvc:
@@ -192,7 +192,7 @@ jobs:
       - name: CMake
         run: |
             cmake ${{matrix.config.generator}}  `
-            -DUSE_SDL2=${{matrix.sdl.use}}  `
+            -DUSE_SDL2=${{matrix.sdl.use}} -DUSE_SDL3=0 `
             -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake"  `
             -DCMAKE_BUILD_TYPE=Release .
 

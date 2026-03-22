@@ -1,3 +1,5 @@
+#include "test_rcpointer.h"
+
 #include <iostream>
 #include <irrlicht.h>
 #include <IFileSystem.h>
@@ -44,6 +46,10 @@ void run_unit_tests()
 	std::cout << "Running unit tests:" << std::endl;
 	try {
 		test_irr_array();
+		{
+			RefCountedFwdDeclarationTest fwd;
+			UASSERT(fwd.value.get() != nullptr);
+		}
 		test_irr_rcpointer();
 		test_irr_string();
 	} catch (const std::exception &e) {
@@ -91,11 +97,14 @@ int main(int argc, char *argv[])
 	gui::IGUIEditBox *editbox = guienv->addEditBox(L"",
 			core::rect<s32>(10, 70, 60, 70 + 16));
 
-	const io::path mediaPath = (
-		io::path("media/")
-	);
+	io::path mediaPath = "media/";
+	auto fs = device->getFileSystem();
+	if (!fs->existFile(mediaPath)) {
+		// When started from ROOT_DIR/bin/PLATFORM/
+		mediaPath = "../../media/";
+	}
 
-	auto mesh_file = device->getFileSystem()->createAndOpenFile(mediaPath + "coolguy_opt.x");
+	auto mesh_file = fs->createAndOpenFile(mediaPath + "coolguy_opt.x");
 	check(mesh_file, "mesh file loading");
 	scene::IAnimatedMesh *mesh = smgr->getMesh(mesh_file);
 	check(mesh, "mesh loading");
