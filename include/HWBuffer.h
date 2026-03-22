@@ -9,7 +9,7 @@ namespace irr
 namespace scene
 {
 
-struct HWBuffer : public virtual IReferenceCounted {
+struct IRRLICHT_API HWBuffer : public virtual IReferenceCounted {
 	enum class Type
 	{
 		VERTEX,

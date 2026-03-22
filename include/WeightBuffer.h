@@ -21,7 +21,7 @@ namespace irr
 namespace scene
 {
 
-struct WeightBuffer final : public HWBuffer
+struct IRRLICHT_API WeightBuffer final : public HWBuffer
 {
 	constexpr static u16 MAX_WEIGHTS_PER_VERTEX = 4;
 	// ID-weight pairs for a joint

@@ -18,7 +18,7 @@ namespace irr
 namespace scene
 {
 
-class AnimatedMeshSceneNode : public ISceneNode
+class IRRLICHT_API AnimatedMeshSceneNode : public ISceneNode
 {
 public:
 	//! constructor

@@ -50,6 +50,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang|AppleClang)$")
 	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 	set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
+	add_compile_options(-Wall)
+
 	# if possible, error on struct/class keyword missmatch
 	check_cxx_compiler_flag("-Werror=mismatched-tags" SUPPORTS_W_MISMATCHED_TAGS)
 	if(SUPPORTS_W_MISMATCHED_TAGS)

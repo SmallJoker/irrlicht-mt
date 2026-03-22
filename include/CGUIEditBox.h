@@ -15,7 +15,7 @@ namespace gui
 
 class IGUIScrollBar;
 
-class CGUIEditBox : public IGUIEditBox
+class IRRLICHT_API CGUIEditBox : public IGUIEditBox
 {
 public:
 	//! constructor
