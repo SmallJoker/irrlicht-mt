@@ -53,6 +53,7 @@ void test_irr_rcpointer()
 	UASSERTEQ(instance_count, 0);
 	{
 		RcPointer<TestObject> what;
+		what.reset(new TestObject());
 	}
 	UASSERTEQ(instance_count, 0);
 	{

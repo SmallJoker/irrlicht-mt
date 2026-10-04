@@ -40,18 +40,26 @@ public:
 		// In case of the compiler error 'non-constant condition for static assertion',
 		// do define the constructor AND destructor if your class in the source file.
 		static_assert(std::is_base_of_v<IReferenceCounted, T>, "");
-		reset_rc();
+		reset(nullptr);
 	}
 
 	RcPointer &operator=(const RcPointer<T> &other)
 	{
-		if (Obj != other.Obj)
-			reset_rc(other.Obj);
+		Obj = other.Obj;
+		if (Obj)
+			Obj->grab();
 		return *this;
 	}
 
-	void reset(T *obj = nullptr) { reset_rc(obj); }
+	/// Does not grab `obj`
+	void reset(T *obj = nullptr)
+	{
+		if (Obj)
+			Obj->drop();
+		Obj = obj;
+	}
 
+	/// Does not drop `obj`
 	T *release()
 	{
 		T *val = get();
@@ -68,15 +76,6 @@ public:
 	operator bool() const { return Obj; }
 
 private:
-	void reset_rc(T *obj = nullptr)
-	{
-		if (Obj)
-			Obj->drop();
-		Obj = obj;
-		if (Obj)
-			Obj->grab();
-	}
-
 	T *Obj;
 };
 
