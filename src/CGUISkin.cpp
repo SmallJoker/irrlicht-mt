@@ -17,6 +17,9 @@ namespace gui
 CGUISkin::CGUISkin(EGUI_SKIN_TYPE type, video::IVideoDriver *driver) :
 		SpriteBank(0), Driver(driver), Type(type)
 {
+	for (video::SColor &c : Colors)
+		c = 0xFFFF0000; // red
+
 	if ((Type == EGST_WINDOWS_CLASSIC) || (Type == EGST_WINDOWS_METALLIC)) {
 		Colors[EGDC_3D_DARK_SHADOW] = video::SColor(101, 50, 50, 50);
 		Colors[EGDC_3D_SHADOW] = video::SColor(101, 130, 130, 130);
@@ -103,6 +106,9 @@ CGUISkin::CGUISkin(EGUI_SKIN_TYPE type, video::IVideoDriver *driver) :
 		Sizes[EGDS_TITLEBARTEXT_DISTANCE_Y] = 2;
 	}
 
+	for (s32 &s : Sizes)
+		s = 0;
+
 	Sizes[EGDS_MESSAGE_BOX_GAP_SPACE] = 15;
 	Sizes[EGDS_MESSAGE_BOX_MIN_TEXT_WIDTH] = 0;
 	Sizes[EGDS_MESSAGE_BOX_MAX_TEXT_WIDTH] = 500;
@@ -116,6 +122,9 @@ CGUISkin::CGUISkin(EGUI_SKIN_TYPE type, video::IVideoDriver *driver) :
 	Sizes[EGDS_BUTTON_PRESSED_SPRITE_OFFSET_X] = 0;
 	Sizes[EGDS_BUTTON_PRESSED_SPRITE_OFFSET_Y] = 0;
 
+	for (core::stringw &text : Texts)
+		text = L"<UNDEFINED>";
+
 	Texts[EGDT_MSG_BOX_OK] = L"OK";
 	Texts[EGDT_MSG_BOX_CANCEL] = L"Cancel";
 	Texts[EGDT_MSG_BOX_YES] = L"Yes";
@@ -124,6 +133,9 @@ CGUISkin::CGUISkin(EGUI_SKIN_TYPE type, video::IVideoDriver *driver) :
 	Texts[EGDT_WINDOW_RESTORE] = L"Restore";
 	Texts[EGDT_WINDOW_MINIMIZE] = L"Minimize";
 	Texts[EGDT_WINDOW_MAXIMIZE] = L"Maximize";
+
+	for (u32 &icon : Icons)
+		icon = 0;
 
 	Icons[EGDI_WINDOW_MAXIMIZE] = 225;
 	Icons[EGDI_WINDOW_RESTORE] = 226;
