@@ -7,6 +7,7 @@
 #include <vector>
 #include "IReadFile.h"
 #include "irrString.h"
+#include "IFileArchive.h"
 #include "IFileSystem.h"
 #include "CFileList.h"
 
@@ -14,6 +15,7 @@ namespace irr
 {
 namespace io
 {
+
 // set if the file is encrypted
 const s16 ZIP_FILE_ENCRYPTED = 0x0001;
 // the fields crc-32, compressed size and uncompressed size are set to

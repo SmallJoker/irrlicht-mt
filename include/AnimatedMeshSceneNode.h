@@ -6,7 +6,6 @@
 
 #include "BoneSceneNode.h"
 #include "ISceneNode.h"
-#include "IAnimatedMesh.h"
 
 #include "SkinnedMesh.h"
 #include "Transform.h"
@@ -17,6 +16,9 @@ namespace irr
 {
 namespace scene
 {
+
+class IAnimatedMesh;
+class ISceneManager;
 
 class IRRLICHT_API AnimatedMeshSceneNode : public ISceneNode
 {

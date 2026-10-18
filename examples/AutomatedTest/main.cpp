@@ -7,6 +7,7 @@
 #include <IGUIButton.h>
 #include <IGUIEditBox.h>
 #include <IGUIEnvironment.h>
+#include <IReadFile.h>
 #include <ISceneManager.h>
 #include <IVideoDriver.h>
 
