@@ -95,7 +95,7 @@ endif()
 set(CMAKE_REQUIRED_INCLUDES ${PROJECT_SOURCE_DIR}/include)
 unset(REVISION_SANITY_CHECK CACHE)
 check_cxx_source_compiles("#include <IrrCompileConfig.h>\n\
-#if IRRLICHT_VERSION_MT_REVISION != ${IRRLICHTMT_REVISION}\n\
+#if IRRLICHT_VERSION_REVISION != ${IRRLICHTMT_REVISION}\n\
 #error\n\
 #endif\n\
 int main() {}" REVISION_SANITY_CHECK)

@@ -4,18 +4,15 @@
 
 #pragma once
 
-//! Identifies the IrrlichtMt fork customized for the Minetest engine
-#define IRRLICHT_VERSION_MT_REVISION 16
-#define IRRLICHT_VERSION_MT "mt15"
-
 //! Irrlicht SDK Version
 #define IRRLICHT_VERSION_MAJOR 1
 #define IRRLICHT_VERSION_MINOR 9
-#define IRRLICHT_VERSION_REVISION 0
-// This flag will be defined only in SVN, the official release code will have
-// it undefined
-#define IRRLICHT_VERSION_SVN alpha
-#define IRRLICHT_SDK_VERSION "1.9.0" IRRLICHT_VERSION_MT
+#define IRRLICHT_VERSION_REVISION 17
+
+//! Identifies the IrrlichtMt fork
+#define IRRLICHT_VERSION_MT_REVISION IRRLICHT_VERSION_REVISION
+
+#define IRRLICHT_SDK_VERSION "1.9.17-mt"
 
 #ifdef _WIN32
 #define IRRCALLCONV __stdcall
