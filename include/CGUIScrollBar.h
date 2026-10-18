@@ -12,7 +12,7 @@ namespace irr
 namespace gui
 {
 
-class CGUIScrollBar : public IGUIScrollBar
+class IRRLICHT_API CGUIScrollBar : public IGUIScrollBar
 {
 public:
 	//! constructor
