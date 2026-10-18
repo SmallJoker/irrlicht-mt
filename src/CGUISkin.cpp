@@ -153,6 +153,9 @@ CGUISkin::CGUISkin(EGUI_SKIN_TYPE type, video::IVideoDriver *driver) :
 	for (u32 i = 0; i < EGDF_COUNT; ++i)
 		Fonts[i] = 0;
 
+	for (u32 i = 0; i < EGDB_COUNT; ++i)
+		Behaviors[i] = 0;
+
 	UseGradient = (Type == EGST_WINDOWS_METALLIC) || (Type == EGST_BURNING_SKIN);
 }
 
@@ -223,6 +226,23 @@ void CGUISkin::setFont(IGUIFont *font, EGUI_DEFAULT_FONT which)
 		Fonts[which] = font;
 	}
 }
+
+
+s32 CGUISkin::getBehavior(EGUI_DEFAULT_BEHAVIOR which) const
+{
+	if (which >= EGDB_COUNT)
+		return 0;
+	return Behaviors[which];
+}
+
+
+void CGUISkin::setBehavior(EGUI_DEFAULT_BEHAVIOR which, s32 value)
+{
+	if (which >= EGDB_COUNT)
+		return;
+	Behaviors[which] = value;
+}
+
 
 //! gets the sprite bank stored
 IGUISpriteBank *CGUISkin::getSpriteBank() const
