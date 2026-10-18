@@ -58,7 +58,7 @@ struct IRRLICHT_API WeightBuffer final : public HWBuffer
 	{ return HWBuffer::Type::WEIGHT; }
 
 	u32 getCount() const override
-	{ return weights.size(); }
+	{ return (u32)weights.size(); }
 
 	u32 getElementSize() const override
 	{ return sizeof(VertexWeights); }
