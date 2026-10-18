@@ -19,10 +19,9 @@ if(USE_SDL2 AND USE_SDL3)
 	set(USE_SDL2 OFF)
 endif()
 
-if(USE_SDL2 OR USE_SDL3)
-	set(USE_SDL_ANY TRUE)
-else()
-	set(USE_SDL_ANY FALSE)
+if(NOT(USE_SDL2 OR USE_SDL3))
+	message(FATAL_ERROR "Platform-specific devices have been removed due to lack \
+		of maintenance power. Please -DUSE_SDL2=1 or -DUSE_SDL3=1.")
 endif()
 
 
@@ -93,7 +92,6 @@ elseif(MSVC)
 endif()
 
 # Sanity-check version
-
 set(CMAKE_REQUIRED_INCLUDES ${PROJECT_SOURCE_DIR}/include)
 unset(REVISION_SANITY_CHECK CACHE)
 check_cxx_source_compiles("#include <IrrCompileConfig.h>\n\
@@ -118,51 +116,19 @@ endif()
 
 if(WIN32)
 	add_compile_definitions(_IRR_WINDOWS_ _IRR_WINDOWS_API_)
-	set(DEVICE "WINDOWS")
 elseif(APPLE)
 	add_compile_definitions(_IRR_OSX_PLATFORM_)
-	set(DEVICE "OSX")
 elseif(ANDROID)
 	add_compile_definitions(_IRR_ANDROID_PLATFORM_)
-	if(NOT USE_SDL_ANY)
-		message(FATAL_ERROR "The Android build requires SDL2 or SDL3")
-	endif()
 elseif(EMSCRIPTEN)
 	add_compile_definitions(_IRR_EMSCRIPTEN_PLATFORM_ _IRR_COMPILE_WITH_EGL_MANAGER_)
-	set(LINUX_PLATFORM TRUE)
-	set(DEVICE "SDL")
 elseif(SOLARIS)
 	add_compile_definitions(_IRR_SOLARIS_PLATFORM_ _IRR_POSIX_API_)
-	set(DEVICE "X11")
 else()
 	add_compile_definitions(_IRR_POSIX_API_)
-	set(LINUX_PLATFORM TRUE)
-	set(DEVICE "X11")
 endif()
 
-if(USE_SDL_ANY)
-	set(DEVICE "SDL")
-elseif(DEVICE STREQUAL "SDL")
-	message(FATAL_ERROR "SDL was used but not enabled?!")
-endif()
-
-add_compile_definitions("_IRR_COMPILE_WITH_${DEVICE}_DEVICE_")
-
-# X11
-
-if(DEVICE STREQUAL "X11")
-	option(USE_X11 "Use X11" TRUE)
-else()
-	set(USE_X11 FALSE)
-endif()
-
-if(LINUX_PLATFORM AND USE_X11)
-	option(USE_XINPUT2 "Use XInput2" TRUE)
-	option(USE_XCURSOR "Use XCursor" FALSE)
-else()
-	set(USE_XINPUT2 FALSE)
-	set(USE_XCURSOR FALSE)
-endif()
+add_compile_definitions("_IRR_COMPILE_WITH_SDL_DEVICE_")
 
 # Joystick
 
@@ -172,12 +138,8 @@ endif()
 
 # OpenGL
 
-if(USE_SDL2)
-	if(NOT ANDROID)
-		set(DEFAULT_OPENGL3 TRUE)
-	endif()
-else()
-	set(DEFAULT_OPENGL3 FALSE)
+if(NOT ANDROID)
+	set(DEFAULT_OPENGL3 TRUE)
 endif()
 option(ENABLE_OPENGL3 "Enable OpenGL 3+" ${DEFAULT_OPENGL3})
 
@@ -205,35 +167,13 @@ else()
 	endif()
 endif()
 
-if(ENABLE_OPENGL OR (ENABLE_OPENGL3 AND NOT USE_SDL2))
-	if(ENABLE_OPENGL)
-		add_compile_definitions(_IRR_COMPILE_WITH_OPENGL_)
-		set(OPENGL_DIRECT_LINK TRUE) # driver relies on this
-	endif()
-	if(DEVICE STREQUAL "WINDOWS")
-		add_compile_definitions(_IRR_COMPILE_WITH_WGL_MANAGER_)
-	elseif(DEVICE STREQUAL "X11")
-		add_compile_definitions(_IRR_COMPILE_WITH_GLX_MANAGER_)
-	elseif(DEVICE STREQUAL "OSX")
-		add_compile_definitions(_IRR_COMPILE_WITH_NSOGL_MANAGER_)
-	endif()
-endif()
-
-if(ENABLE_OPENGL3)
-	if(DEVICE STREQUAL "WINDOWS")
-		# supported
-	elseif(DEVICE STREQUAL "X11")
-		# supported
-	elseif (NOT USE_SDL2 AND NOT USE_SDL3)
-		message(FATAL_ERROR "OpenGL 3 driver requires SDL")
-	endif()
+if(ENABLE_OPENGL)
+	add_compile_definitions(_IRR_COMPILE_WITH_OPENGL_)
+	set(OPENGL_DIRECT_LINK TRUE) # driver relies on this
 endif()
 
 if(ENABLE_GLES2)
 	add_compile_definitions(_IRR_COMPILE_WITH_OGLES2_)
-	if(DEVICE MATCHES "^(WINDOWS|X11)$" OR EMSCRIPTEN)
-		add_compile_definitions(_IRR_COMPILE_WITH_EGL_MANAGER_)
-	endif()
 endif()
 
 if(ENABLE_WEBGL1)
@@ -250,7 +190,6 @@ endif()
 
 # Configuration report
 
-message(STATUS "Device: ${DEVICE}")
 message(STATUS "OpenGL (legacy): ${ENABLE_OPENGL}")
 message(STATUS "OpenGL 3: ${ENABLE_OPENGL3}")
 message(STATUS "OpenGL ES 2: ${ENABLE_GLES2}")
@@ -345,16 +284,7 @@ endif()
 if(ANDROID)
 	enable_language(C)
 elseif(APPLE)
-	find_library(COCOA_LIB Cocoa REQUIRED)
-	find_library(IOKIT_LIB IOKit REQUIRED)
-
 	add_compile_definitions(GL_SILENCE_DEPRECATION)
-elseif(NOT USE_SDL2)
-	# Unix probably
-	find_package(X11 REQUIRED)
-	if(USE_XINPUT2 AND NOT X11_Xi_FOUND)
-		message(FATAL_ERROR "XInput not found")
-	endif()
 endif()
 
 set(link_includes
@@ -368,8 +298,6 @@ set(link_includes
 
 	${OPENGL_INCLUDE_DIR}
 	${EGL_INCLUDE_DIR}
-
-	"$<$<BOOL:${USE_X11}>:${X11_INCLUDE_DIR}>"
 )
 
 # Source files
@@ -397,14 +325,10 @@ add_library(IRRMESHOBJ OBJECT
 
 set(IRRDRVROBJ
 	CNullDriver.h
-	CGLXManager.h
-	CWGLManager.h
 	CEGLManager.h
 	CSDLManager.h
 
 	CNullDriver.cpp
-	CGLXManager.cpp
-	CWGLManager.cpp
 	CEGLManager.cpp
 	CSDLManager.cpp
 	mt_opengl_loader.cpp
@@ -506,17 +430,13 @@ add_library(IRRIOOBJ OBJECT
 
 add_library(IRROTHEROBJ OBJECT
 	CIrrDeviceSDL.h
-	CIrrDeviceLinux.h
 	CIrrDeviceStub.h
-	CIrrDeviceWin32.h
 	CLogger.h
 	COSOperator.h
 	os.h
 
 	CIrrDeviceSDL.cpp
-	CIrrDeviceLinux.cpp
 	CIrrDeviceStub.cpp
-	CIrrDeviceWin32.cpp
 	CLogger.cpp
 	COSOperator.cpp
 	Irrlicht.cpp
@@ -530,22 +450,6 @@ endif()
 if(APPLE)
 	# Build all IRROTHEROBJ sources as objc++, including the .cpp's
 	set_target_properties(IRROTHEROBJ PROPERTIES COMPILE_OPTIONS "-xobjective-c++")
-	target_sources(IRROTHEROBJ PRIVATE
-		CIrrDeviceOSX.mm
-		CNSOGLManager.mm
-	)
-endif()
-
-if(USE_X11)
-	target_compile_definitions(IRROTHEROBJ PRIVATE _IRR_COMPILE_WITH_X11_)
-endif()
-
-if(USE_XINPUT2)
-	target_compile_definitions(IRROTHEROBJ PRIVATE _IRR_LINUX_X11_XINPUT2_)
-endif()
-
-if(USE_XCURSOR)
-	target_compile_definitions(IRROTHEROBJ PRIVATE _IRR_LINUX_XCURSOR_)
 endif()
 
 if(USE_SDL3)
@@ -655,12 +559,6 @@ target_link_libraries(IrrlichtMt PRIVATE
 
 	# incl. transitive SDL2 dependencies for static linking
 	"$<$<PLATFORM_ID:Android>:-landroid -llog -lGLESv2 -lGLESv1_CM -lOpenSLES>"
-	${COCOA_LIB}
-	${IOKIT_LIB}
-	"$<$<PLATFORM_ID:Windows>:gdi32>"
-	"$<$<PLATFORM_ID:Windows>:winmm>"
-	"$<$<BOOL:${USE_X11}>:${X11_X11_LIB}>"
-	"$<$<BOOL:${USE_X11}>:${X11_Xi_LIB}>"
 )
 
 if(WIN32)

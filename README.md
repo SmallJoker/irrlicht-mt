@@ -18,9 +18,7 @@ The following libraries are required to be installed:
 * zlib, libPNG, libJPEG
 * OpenGL or OpenGL ES
   * a headless build is possible, but not very useful
-* OS integration:
-  * Either: SDL2 or SDL3 (recommended)
-  * Or: X11 (Unix) if SDL is not used.
+* OS integration: SDL2 or SDL3
 
 Aside from standard search options (`ZLIB_INCLUDE_DIR`, `ZLIB_LIBRARY`, ...) the following options are available:
 
@@ -42,7 +40,7 @@ CMake will create the file `${BUILD_DIR}/cmake/IrrlichtMtTargets.cmake` which it
 
 	git clone https://github.com/THIS_REPO/NAME
 	cd irrlicht
-	cmake . -DBUILD_SHARED_LIBS=OFF
+	cmake .
 	make -j
 
 
@@ -79,20 +77,17 @@ Compatibility matrix
 
 Driver (rows) vs Device (columns)
 
-|                           | SDL [1]  | Linux [2]      | OSX [3]          | Win32 [4]       |
-|---------------------------|----------|----------------|------------------|-----------------|
-| OpenGL 1.2 (to 2.1)       | Works    | Works (GLX)    | Works (NSOpenGL) | Works (WGL)     |
-| OpenGL 3.2+               | Works    | Testing (GLX)  | Not implemented  | Testing (WGL)   |
-| OpenGL ES 2.x             | Works    | Untested (EGL) | Not implemented  | Untested (EGL)  |
-| WebGL 1                   | Untested | Untested (EGL) | Not implemented  | Not implemented |
-| Null (no graphics output) | Works    | Works          | Works            | Works           |
+|                           | SDL [1]  |
+|---------------------------|----------|
+| OpenGL 1.2 (to 2.1)       | Works    |
+| OpenGL 3.2+               | Works    |
+| OpenGL ES 2.x             | Works    |
+| WebGL 1                   | Untested |
+| Null (no graphics output) | Works    |
 
 Notes:
 
 * [1] `CIrrDeviceSDL`: supports [many platforms](https://wiki.libsdl.org/SDL3/README-platforms)
-* [2] `CIrrDeviceLinux`: supports Linux
-* [3] `CIrrDeviceOSX`: supports macOS
-* [4] `CIrrDeviceWin32`: supports Windows
 
 
 ### Minimal SDL3 configuration
