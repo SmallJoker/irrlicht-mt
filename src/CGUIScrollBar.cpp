@@ -90,10 +90,7 @@ bool CGUIScrollBar::OnEvent(const SEvent &event)
 			break;
 		case EET_GUI_EVENT:
 			if (event.GUIEvent.EventType == EGET_BUTTON_CLICKED) {
-				if (event.GUIEvent.Caller == UpButton)
-					setPosAndSend(Pos - SmallStep);
-				else if (event.GUIEvent.Caller == DownButton)
-					setPosAndSend(Pos + SmallStep);
+				// Scolling handled by `handleAutoScroll`
 
 				return true;
 			} else if (event.GUIEvent.EventType == EGET_ELEMENT_FOCUS_LOST) {
