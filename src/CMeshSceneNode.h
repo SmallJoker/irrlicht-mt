@@ -7,6 +7,8 @@
 #include "IMeshSceneNode.h"
 #include "IMesh.h"
 
+#include <vector>
+
 namespace irr
 {
 namespace scene
