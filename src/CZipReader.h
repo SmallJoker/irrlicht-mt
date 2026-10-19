@@ -16,11 +16,9 @@ namespace irr
 namespace io
 {
 
-// set if the file is encrypted
-const s16 ZIP_FILE_ENCRYPTED = 0x0001;
 // the fields crc-32, compressed size and uncompressed size are set to
 // zero in the local header
-const s16 ZIP_INFO_IN_DATA_DESCRIPTOR = 0x0008;
+static constexpr u16 ZIP_INFO_IN_DATA_DESCRIPTOR = 0x0008;
 
 // byte-align structures
 #include "irrpack.h"
@@ -32,17 +30,19 @@ struct SZIPFileDataDescriptor
 	u32 UncompressedSize;
 } PACK_STRUCT;
 
+// These must be unsigned: a signed length read off disk can be negative, which
+// turns the allocations and bounds checks derived from it into overflows.
 struct SZIPFileHeader
 {
 	u32 Sig; // 'PK0304' little endian (0x04034b50)
-	s16 VersionToExtract;
-	s16 GeneralBitFlag;
-	s16 CompressionMethod;
-	s16 LastModFileTime;
-	s16 LastModFileDate;
+	u16 VersionToExtract;
+	u16 GeneralBitFlag;
+	u16 CompressionMethod;
+	u16 LastModFileTime;
+	u16 LastModFileDate;
 	SZIPFileDataDescriptor DataDescriptor;
-	s16 FilenameLength;
-	s16 ExtraFieldLength;
+	u16 FilenameLength;
+	u16 ExtraFieldLength;
 	// filename (variable size)
 	// extra field (variable size )
 } PACK_STRUCT;
