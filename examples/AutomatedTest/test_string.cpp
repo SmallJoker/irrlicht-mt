@@ -70,10 +70,10 @@ static void test_methods()
 	stringc s;
 	const auto &sref = s;
 	s = "irrlicht";
-	UASSERTEQ(sref.size(), 8);
+	UASSERTEQ(sref.size(), 8U);
 	UASSERT(!sref.empty());
 	s.clear();
-	UASSERTEQ(sref.size(), 0);
+	UASSERTEQ(sref.size(), 0U);
 	UASSERT(sref.empty());
 	UASSERT(sref[0] == 0);
 	s = "\tAz#`";
@@ -147,19 +147,19 @@ static void test_methods()
 	s = "a";
 	s.append('\0');
 	s.append('b');
-	UASSERTEQ(s.size(), 3);
+	UASSERTEQ(s.size(), 3U);
 	s.validate();
-	UASSERTEQ(s.size(), 1);
+	UASSERTEQ(s.size(), 1U);
 	UASSERTEQ(s.lastChar(), 'a');
 	std::vector<stringc> res;
 	s = "a,,b,c";
 	s.split(res, ",aa", 1, true, false);
-	UASSERTEQ(res.size(), 3);
+	UASSERTEQ(res.size(), 3U);
 	UASSERTSTR(res[0], "a");
 	UASSERTSTR(res[2], "c");
 	res.clear();
 	s.split(res, ",", 1, false, true);
-	UASSERTEQ(res.size(), 7);
+	UASSERTEQ(res.size(), 7U);
 	UASSERTSTR(res[0], "a");
 	UASSERTSTR(res[2], "");
 	for (int i = 0; i < 3; i++)
@@ -172,13 +172,13 @@ static void test_conv()
 
 	stringw out;
 	utf8ToWString(out, "†††");
-	UASSERTEQ(out.size(), 3);
+	UASSERTEQ(out.size(), 3U);
 	for (int i = 0; i < 3; i++)
 		UASSERTEQ(static_cast<u16>(out[i]), 0x2020);
 
 	stringc out2;
 	wStringToUTF8(out2, L"†††");
-	UASSERTEQ(out2.size(), 9);
+	UASSERTEQ(out2.size(), 9U);
 	for (int i = 0; i < 3; i++) {
 		UASSERTEQ(static_cast<u8>(out2[3 * i]), 0xe2);
 		UASSERTEQ(static_cast<u8>(out2[3 * i + 1]), 0x80);
@@ -191,7 +191,7 @@ static void test_conv()
 
 	stringw out3;
 	multibyteToWString(out3, "†††");
-	UASSERTEQ(out3.size(), 3);
+	UASSERTEQ(out3.size(), 3U);
 	for (int i = 0; i < 3; i++)
 		UASSERTEQ(static_cast<u16>(out3[i]), 0x2020);
 }

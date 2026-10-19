@@ -12,50 +12,50 @@ static void test_basics()
 	v.insert(4, 0);  // 4, 2, 1
 	v.insert(3, 1);  // 4, 3, 2, 1
 	v.insert(0, 4);  // 4, 3, 2, 1, 0
-	UASSERTEQ(v.size(), 5);
+	UASSERTEQ(v.size(), 5U);
 	UASSERTEQ(v[0], 4);
 	UASSERTEQ(v[1], 3);
 	UASSERTEQ(v[2], 2);
 	UASSERTEQ(v[3], 1);
 	UASSERTEQ(v[4], 0);
 	array<int> w = v;
-	UASSERTEQ(w.size(), 5);
+	UASSERTEQ(w.size(), 5U);
 	UASSERT(w == v);
 	w.clear();
-	UASSERTEQ(w.size(), 0);
-	UASSERTEQ(w.allocated_size(), 0);
+	UASSERTEQ(w.size(), 0U);
+	UASSERTEQ(w.allocated_size(), 0U);
 	UASSERT(w.empty());
 	w = v;
-	UASSERTEQ(w.size(), 5);
+	UASSERTEQ(w.size(), 5U);
 	w.set_used(3);
-	UASSERTEQ(w.size(), 3);
+	UASSERTEQ(w.size(), 3U);
 	UASSERTEQ(w[0], 4);
 	UASSERTEQ(w[1], 3);
 	UASSERTEQ(w[2], 2);
 	UASSERTEQ(w.getLast(), 2);
 	w.set_used(20);
-	UASSERTEQ(w.size(), 20);
+	UASSERTEQ(w.size(), 20U);
 	w = v;
 	w.sort();
-	UASSERTEQ(w.size(), 5);
+	UASSERTEQ(w.size(), 5U);
 	UASSERTEQ(w[0], 0);
 	UASSERTEQ(w[1], 1);
 	UASSERTEQ(w[2], 2);
 	UASSERTEQ(w[3], 3);
 	UASSERTEQ(w[4], 4);
 	w.erase(0);
-	UASSERTEQ(w.size(), 4);
+	UASSERTEQ(w.size(), 4U);
 	UASSERTEQ(w[0], 1);
 	UASSERTEQ(w[1], 2);
 	UASSERTEQ(w[2], 3);
 	UASSERTEQ(w[3], 4);
 	w.erase(1, 2);
-	UASSERTEQ(w.size(), 2);
+	UASSERTEQ(w.size(), 2U);
 	UASSERTEQ(w[0], 1);
 	UASSERTEQ(w[1], 4);
 	w.swap(v);
-	UASSERTEQ(w.size(), 5);
-	UASSERTEQ(v.size(), 2);
+	UASSERTEQ(w.size(), 5U);
+	UASSERTEQ(v.size(), 2U);
 }
 
 static void test_linear_searches()

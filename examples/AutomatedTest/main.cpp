@@ -119,8 +119,11 @@ int main(int argc, char *argv[])
 			node->forEachMaterial([tex](video::SMaterial &mat) {
 				mat.setTexture(0, tex);
 			});
-			node->setFrameLoop(0, 29);
-			node->setAnimationSpeed(30);
+
+			auto &track = node->getAnimation().tracks[0]; // create new
+			track.fps = 30;
+			track.min_frame = 0,
+			track.max_frame = 29;
 		}
 	}
 
@@ -135,7 +138,7 @@ int main(int argc, char *argv[])
 			device->getTimer()->setTime(0);
 			++n;
 			if (n == 1) { // Tooltip display
-				bzero(&event, sizeof(SEvent));
+				event = {};
 				event.EventType = EET_MOUSE_INPUT_EVENT;
 				event.MouseInput.Event = EMIE_MOUSE_MOVED;
 				event.MouseInput.X = button->getAbsolutePosition().getCenter().X;
@@ -144,7 +147,7 @@ int main(int argc, char *argv[])
 			} else if (n == 2) // Text input focus
 				guienv->setFocus(editbox);
 			else if (n == 3) { // Keypress for Text input
-				bzero(&event, sizeof(SEvent));
+				event = {};
 				event.EventType = EET_KEY_INPUT_EVENT;
 				event.KeyInput.Char = L'a';
 				event.KeyInput.Key = KEY_KEY_A;
