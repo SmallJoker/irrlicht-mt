@@ -20,6 +20,9 @@ CGUISkin::CGUISkin(EGUI_SKIN_TYPE type, video::IVideoDriver *driver) :
 	for (video::SColor &c : Colors)
 		c = 0xFFFF0000; // red
 
+	for (s32 &s : Sizes)
+		s = 0;
+
 	if ((Type == EGST_WINDOWS_CLASSIC) || (Type == EGST_WINDOWS_METALLIC)) {
 		Colors[EGDC_3D_DARK_SHADOW] = video::SColor(101, 50, 50, 50);
 		Colors[EGDC_3D_SHADOW] = video::SColor(101, 130, 130, 130);
@@ -105,9 +108,6 @@ CGUISkin::CGUISkin(EGUI_SKIN_TYPE type, video::IVideoDriver *driver) :
 		Sizes[EGDS_TITLEBARTEXT_DISTANCE_X] = 3;
 		Sizes[EGDS_TITLEBARTEXT_DISTANCE_Y] = 2;
 	}
-
-	for (s32 &s : Sizes)
-		s = 0;
 
 	Sizes[EGDS_MESSAGE_BOX_GAP_SPACE] = 15;
 	Sizes[EGDS_MESSAGE_BOX_MIN_TEXT_WIDTH] = 0;
