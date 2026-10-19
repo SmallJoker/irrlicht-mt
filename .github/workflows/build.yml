@@ -65,62 +65,10 @@ jobs:
           cd bin/Linux
           LIBGL_ALWAYS_SOFTWARE=true xvfb-run ./AutomatedTest ogles2
 
-  mingw:
-    # TODO: Re-enable after getting rid of codecvt
-    if: false
-    name: "MinGW ${{matrix.config.variant}}${{matrix.config.extras}}"
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-      matrix:
-        config:
-          - {variant: win64, arch: x86_64}
-          - {variant: win64, arch: x86_64, extras: "-sdl"}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install compiler
-        run: |
-          sudo apt-get update && sudo apt-get install cmake -qyy
-          ./scripts/ci-get-mingw.sh
-
-      - name: Build
-        run: |
-          ./scripts/ci-build-mingw.sh package
-        env:
-          CC: ${{matrix.config.arch}}-w64-mingw32-clang
-          CXX: ${{matrix.config.arch}}-w64-mingw32-clang++
-          extras: ${{matrix.config.extras}}
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: irrlicht-${{matrix.config.variant}}${{matrix.config.extras}}
-          path: ./irrlicht-${{matrix.config.variant}}${{matrix.config.extras}}.zip
-
-  macos:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install deps
-        run: |
-          brew update --auto-update
-          brew install cmake libpng jpeg
-        env:
-          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
-          HOMEBREW_NO_INSTALL_CLEANUP: 1
-
-      - name: Build
-        run: |
-          cmake . -DUSE_SDL2=0 -DUSE_SDL3=0 -DCMAKE_FIND_FRAMEWORK=LAST -DBUILD_EXAMPLES=1
-          make -j3
-
-      - name: Test (headless)
-        run: |
-          ./bin/OSX/AutomatedTest null
-
   macos-sdl:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install deps
         run: |
           brew update --auto-update
@@ -134,34 +82,27 @@ jobs:
           cmake . -DUSE_SDL2=1 -DUSE_SDL3=0 -DCMAKE_FIND_FRAMEWORK=LAST -DBUILD_EXAMPLES=1
           make -j3
 
-  msvc:
-    name: VS 2025 ${{ matrix.config.arch }} ${{ matrix.sdl.label }}
-    runs-on: windows-2025
+  msvc-2026:
+    runs-on: windows-latest
     env:
-      VCPKG_VERSION: 74e6536215718009aae747d86d84b78376bf9e09
+      VCPKG_VERSION: 9e593bb18ea69cc5095e012465dcd675a822ed0d
       vcpkg_packages: zlib libpng libjpeg-turbo
     strategy:
       fail-fast: false
       matrix:
         config:
           -
-            arch: x64
-            generator: "-G'Visual Studio 17 2022' -A x64"
+            generator: "-G'Visual Studio 18 2026' -A x64"
             vcpkg_triplet: x64-windows
-        sdl:
-          -
-            use: TRUE
-            label: '(with SDL2)'
-            vcpkg_packages: sdl2
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Restore from cache and run vcpkg
         uses: lukka/run-vcpkg@v7
         with:
-          vcpkgArguments: ${{env.vcpkg_packages}} ${{matrix.sdl.vcpkg_packages}}
+          vcpkgArguments: zlib libpng libjpeg-turbo sdl2
           vcpkgDirectory: '${{ github.workspace }}\vcpkg'
           appendedCacheKey: ${{ matrix.config.vcpkg_triplet }}
           vcpkgGitCommitId: ${{ env.VCPKG_VERSION }}
@@ -170,7 +111,7 @@ jobs:
       - name: CMake
         run: |
             cmake ${{matrix.config.generator}}  `
-            -DUSE_SDL2=${{matrix.sdl.use}} -DUSE_SDL3=0 `
+            -DUSE_SDL2=1 -DUSE_SDL3=0 `
             -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake"  `
             -DCMAKE_BUILD_TYPE=Release .
 
@@ -191,7 +132,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: msvc-${{ matrix.config.arch }}-${{matrix.sdl.use}}
+          name: msvc-${{ matrix.config.vcpkg_triplet }}
           path: artifact/
 
   android:
