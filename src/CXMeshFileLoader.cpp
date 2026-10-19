@@ -91,6 +91,8 @@ IAnimatedMesh *CXMeshFileLoader::createMesh(io::IReadFile *file)
 	P = 0;
 	End = 0;
 	CurFrame = 0;
+	ErrorState = false;
+	JointKeysIdx.clear();
 
 	delete[] Buffer;
 	Buffer = 0;

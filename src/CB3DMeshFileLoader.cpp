@@ -28,13 +28,70 @@ namespace irr
 namespace scene
 {
 
+namespace
+{
+
+//! Per-load worker holding all transient state for a single .b3d file. The
+//! registered CB3DMeshFileLoader creates a fresh instance for each createMesh()
+//! call and discards it when the load finishes, so no state can ever leak from
+//! one load into the next.
+class B3DMeshReader
+{
+public:
+	explicit B3DMeshReader(io::IReadFile *file) :
+			B3DFile(file) {}
+
+	IAnimatedMesh *createMesh();
+
+private:
+	bool load();
+	std::optional<SB3dChunkHeader> readChunkHeader(size_t sizelim);
+	bool readChunkNODE(SkinnedMesh::SJoint *InJoint);
+	bool readChunkMESH(SkinnedMesh::SJoint *InJoint);
+	bool readChunkVRTS(SkinnedMesh::SJoint *InJoint);
+	bool readChunkTRIS(scene::SSkinMeshBuffer *MeshBuffer, u32 MeshBufferID, s32 Vertices_Start);
+	bool readChunkBONE(SkinnedMesh::SJoint *InJoint);
+	bool readChunkKEYS(SkinnedMesh::SJoint *InJoint);
+	bool readChunkANIM();
+	bool readChunkTEXS();
+	bool readChunkBRUS();
+
+	std::string readString();
+	void readFloats(f32 *vec, u32 count);
+
+	size_t getRemainingBytesInChunk() const
+	{
+		return std::max<long>(0, B3dStack.getLast().startposition +
+				B3dStack.getLast().length - B3DFile->getPos());
+	}
+
+	core::array<SB3dChunk> B3dStack;
+
+	core::array<SB3dMaterial> Materials;
+	core::array<SB3dTexture> Textures;
+
+	core::array<s32> AnimatedVertices_VertexID;
+
+	core::array<s32> AnimatedVertices_BufferID;
+
+	core::array<video::S3DVertex2TCoords> BaseVertices;
+
+	SkinnedMeshBuilder AnimatedMesh{SkinnedMesh::SourceFormat::B3D};
+	io::IReadFile *B3DFile;
+
+	// B3Ds have Vertex ID's local within the mesh I don't want this
+	//  Variable needs to be class member due to recursion in calls
+	u32 VerticesStart = 0;
+
+	bool NormalsInFile = false;
+	bool HasVertexColors = false;
+	bool ShowWarning = true;
+};
+
+} // namespace
+
 //! Constructor
-CB3DMeshFileLoader::CB3DMeshFileLoader(scene::ISceneManager *smgr) :
-		B3DFile(nullptr),
-		VerticesStart(0),
-		NormalsInFile(false),
-		HasVertexColors(false),
-		ShowWarning(true)
+CB3DMeshFileLoader::CB3DMeshFileLoader(scene::ISceneManager *smgr)
 {}
 
 //! returns true if the file maybe is able to be loaded by this class
@@ -53,11 +110,12 @@ IAnimatedMesh *CB3DMeshFileLoader::createMesh(io::IReadFile *file)
 	if (!file)
 		return nullptr;
 
-	B3DFile = file;
-	AnimatedMesh = scene::SkinnedMeshBuilder(SkinnedMesh::SourceFormat::B3D);
-	ShowWarning = true; // If true a warning is issued if too many textures are used
-	VerticesStart = 0;
+	B3DMeshReader reader(file);
+	return reader.createMesh();
+}
 
+IAnimatedMesh *B3DMeshReader::createMesh()
+{
 	if (!load())
 		return nullptr;
 
@@ -66,7 +124,7 @@ IAnimatedMesh *CB3DMeshFileLoader::createMesh(io::IReadFile *file)
 
 static constexpr int HEADER_BYTES = 8; // 4 + 4 bytes type + size
 
-std::optional<SB3dChunkHeader> CB3DMeshFileLoader::readChunkHeader(size_t sizelim)
+std::optional<SB3dChunkHeader> B3DMeshReader::readChunkHeader(size_t sizelim)
 {
 	SB3dChunkHeader header;
 	B3DFile->read(&header.name, sizeof(header.name));
@@ -81,13 +139,8 @@ std::optional<SB3dChunkHeader> CB3DMeshFileLoader::readChunkHeader(size_t sizeli
 	return header;
 }
 
-bool CB3DMeshFileLoader::load()
+bool B3DMeshReader::load()
 {
-	B3dStack.clear();
-
-	NormalsInFile = false;
-	HasVertexColors = false;
-
 	const auto header = readChunkHeader(B3DFile->getRemainingBytes());
 	if (!header)
 		return false;
@@ -132,19 +185,10 @@ bool CB3DMeshFileLoader::load()
 		}
 	}
 
-	B3dStack.clear();
-
-	BaseVertices.clear();
-	AnimatedVertices_VertexID.clear();
-	AnimatedVertices_BufferID.clear();
-
-	Materials.clear();
-	Textures.clear();
-
 	return true;
 }
 
-bool CB3DMeshFileLoader::readChunkNODE(SkinnedMesh::SJoint *inJoint)
+bool B3DMeshReader::readChunkNODE(SkinnedMesh::SJoint *inJoint)
 {
 	SkinnedMesh::SJoint *joint = AnimatedMesh.addJoint(inJoint);
 	joint->Name = readString();
@@ -212,7 +256,7 @@ bool CB3DMeshFileLoader::readChunkNODE(SkinnedMesh::SJoint *inJoint)
 	return true;
 }
 
-bool CB3DMeshFileLoader::readChunkMESH(SkinnedMesh::SJoint *inJoint)
+bool B3DMeshReader::readChunkMESH(SkinnedMesh::SJoint *inJoint)
 {
 #ifdef _B3D_READER_DEBUG
 	core::stringc logStr;
@@ -298,7 +342,7 @@ VRTS:
   float tex_coords[tex_coord_sets][tex_coord_set_size]	;tex coords
   }
 */
-bool CB3DMeshFileLoader::readChunkVRTS(SkinnedMesh::SJoint *inJoint)
+bool B3DMeshReader::readChunkVRTS(SkinnedMesh::SJoint *inJoint)
 {
 #ifdef _B3D_READER_DEBUG
 	core::stringc logStr;
@@ -401,7 +445,7 @@ bool CB3DMeshFileLoader::readChunkVRTS(SkinnedMesh::SJoint *inJoint)
 	return true;
 }
 
-bool CB3DMeshFileLoader::readChunkTRIS(scene::SSkinMeshBuffer *meshBuffer, u32 meshBufferID, s32 vertices_Start)
+bool B3DMeshReader::readChunkTRIS(scene::SSkinMeshBuffer *meshBuffer, u32 meshBufferID, s32 vertices_Start)
 {
 #ifdef _B3D_READER_DEBUG
 	core::stringc logStr;
@@ -505,12 +549,12 @@ bool CB3DMeshFileLoader::readChunkTRIS(scene::SSkinMeshBuffer *meshBuffer, u32 m
 	B3dStack.erase(B3dStack.size() - 1);
 
 	if (showVertexWarning)
-		os::Printer::log("B3dMeshLoader: Warning, different meshbuffers linking to the same vertex, this will cause problems with animated meshes");
+		os::Printer::log("B3dMeshReader: Warning, different meshbuffers linking to the same vertex, this will cause problems with animated meshes");
 
 	return true;
 }
 
-bool CB3DMeshFileLoader::readChunkBONE(SkinnedMesh::SJoint *inJoint)
+bool B3DMeshReader::readChunkBONE(SkinnedMesh::SJoint *inJoint)
 {
 #ifdef _B3D_READER_DEBUG
 	core::stringc logStr;
@@ -539,7 +583,7 @@ bool CB3DMeshFileLoader::readChunkBONE(SkinnedMesh::SJoint *inJoint)
 			}
 
 			if (AnimatedVertices_VertexID[globalVertexID] == -1) {
-				os::Printer::log("B3dMeshLoader: Weight has bad vertex id (no link to meshbuffer index found)");
+				os::Printer::log("B3dMeshReader: Weight has bad vertex id (no link to meshbuffer index found)");
 			} else if (strength > 0) {
 				AnimatedMesh.addWeight(inJoint,
 						AnimatedVertices_BufferID[globalVertexID],
@@ -553,7 +597,7 @@ bool CB3DMeshFileLoader::readChunkBONE(SkinnedMesh::SJoint *inJoint)
 	return true;
 }
 
-bool CB3DMeshFileLoader::readChunkKEYS(SkinnedMesh::SJoint *inJoint)
+bool B3DMeshReader::readChunkKEYS(SkinnedMesh::SJoint *inJoint)
 {
 	SkinnedMesh::Keys keys;
 #ifdef _B3D_READER_DEBUG
@@ -610,7 +654,7 @@ bool CB3DMeshFileLoader::readChunkKEYS(SkinnedMesh::SJoint *inJoint)
 	return true;
 }
 
-bool CB3DMeshFileLoader::readChunkANIM()
+bool B3DMeshReader::readChunkANIM()
 {
 #ifdef _B3D_READER_DEBUG
 	core::stringc logStr;
@@ -638,7 +682,7 @@ bool CB3DMeshFileLoader::readChunkANIM()
 	return true;
 }
 
-bool CB3DMeshFileLoader::readChunkTEXS()
+bool B3DMeshReader::readChunkTEXS()
 {
 #ifdef _B3D_READER_DEBUG
 	core::stringc logStr;
@@ -681,7 +725,7 @@ bool CB3DMeshFileLoader::readChunkTEXS()
 	return true;
 }
 
-bool CB3DMeshFileLoader::readChunkBRUS()
+bool B3DMeshReader::readChunkBRUS()
 {
 #ifdef _B3D_READER_DEBUG
 	core::stringc logStr;
@@ -826,7 +870,7 @@ bool CB3DMeshFileLoader::readChunkBRUS()
 	return true;
 }
 
-std::string CB3DMeshFileLoader::readString()
+std::string B3DMeshReader::readString()
 {
 	std::string newstring = "";
 	while (true) {
@@ -840,7 +884,7 @@ std::string CB3DMeshFileLoader::readString()
 	return newstring;
 }
 
-void CB3DMeshFileLoader::readFloats(f32 *vec, u32 count)
+void B3DMeshReader::readFloats(f32 *vec, u32 count)
 {
 	B3DFile->read(vec, count * sizeof(f32));
 #ifdef __BIG_ENDIAN__
