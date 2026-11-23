@@ -730,7 +730,7 @@ void CGUIEditBox::draw()
 	video::SColor bgColor = OverrideBgColor;
 	if (OverrideBgColor.color == 0) {
 		EGUI_DEFAULT_COLOR bgCol = EGDC_GRAY_EDITABLE;
-		if (isEnabled())
+		if (IsWritable)
 			bgCol = focus ? EGDC_FOCUSED_EDITABLE : EGDC_EDITABLE;
 		bgColor = skin->getColor(bgCol);
 	}

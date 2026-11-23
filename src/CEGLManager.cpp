@@ -37,19 +37,11 @@ bool CEGLManager::initialize(const SIrrlichtCreationParameters &params, const SE
 		return true;
 
 		// Window is depend on platform.
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-	EglWindow = (NativeWindowType)Data.OpenGLWin32.HWnd;
-	Data.OpenGLWin32.HDc = GetDC((HWND)EglWindow);
-	EglDisplay = eglGetDisplay((NativeDisplayType)Data.OpenGLWin32.HDc);
-#elif defined(_IRR_EMSCRIPTEN_PLATFORM_)
+#if defined(_IRR_EMSCRIPTEN_PLATFORM_)
 	EglWindow = 0;
 	EglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-#elif defined(_IRR_COMPILE_WITH_X11_DEVICE_)
-	EglWindow = (NativeWindowType)Data.OpenGLLinux.X11Window;
-	EglDisplay = eglGetDisplay((NativeDisplayType)Data.OpenGLLinux.X11Display);
-#elif defined(_IRR_COMPILE_WITH_FB_DEVICE_)
-	EglWindow = (NativeWindowType)Data.OpenGLFB.Window;
-	EglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+#else
+#error Not implemented
 #endif
 
 	// We must check if EGL display is valid.
@@ -84,13 +76,6 @@ void CEGLManager::terminate()
 		eglTerminate(EglDisplay);
 		EglDisplay = EGL_NO_DISPLAY;
 	}
-
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-	if (Data.OpenGLWin32.HDc) {
-		ReleaseDC((HWND)EglWindow, (HDC)Data.OpenGLWin32.HDc);
-		Data.OpenGLWin32.HDc = 0;
-	}
-#endif
 
 	MajorVersion = 0;
 	MinorVersion = 0;

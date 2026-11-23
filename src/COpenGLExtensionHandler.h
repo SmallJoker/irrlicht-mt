@@ -1169,9 +1169,6 @@ public:
 	void irrGlBlendEquationIndexed(GLuint buf, GLenum mode);
 	void irrGlBlendEquationSeparateIndexed(GLuint buf, GLenum modeRGB, GLenum modeAlpha);
 
-	// generic vsync setting method for several extensions
-	void extGlSwapInterval(int interval);
-
 	// the global feature array
 	bool FeatureAvailable[IRR_OpenGL_Feature_Count];
 
@@ -2043,33 +2040,6 @@ inline void COpenGLExtensionHandler::irrGlBlendEquationSeparateIndexed(GLuint bu
 		pGlBlendEquationSeparateiARB(buf, modeRGB, modeAlpha);
 	else if (FeatureAvailable[IRR_AMD_draw_buffers_blend] && pGlBlendEquationSeparateIndexedAMD)
 		pGlBlendEquationSeparateIndexedAMD(buf, modeRGB, modeAlpha);
-}
-
-inline void COpenGLExtensionHandler::extGlSwapInterval(int interval)
-{
-	// we have wglext, so try to use that
-#if defined(_IRR_WINDOWS_API_) && defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-#ifdef WGL_EXT_swap_control
-	if (pWglSwapIntervalEXT)
-		pWglSwapIntervalEXT(interval);
-#endif
-#endif
-#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
-#if defined(GLX_MESA_swap_control)
-	if (pGlxSwapIntervalMESA)
-		pGlxSwapIntervalMESA(interval);
-#elif defined(GLX_EXT_swap_control)
-	Display *dpy = glXGetCurrentDisplay();
-	GLXDrawable drawable = glXGetCurrentDrawable();
-	if (pGlxSwapIntervalEXT)
-		pGlxSwapIntervalEXT(dpy, drawable, interval);
-#elif defined(GLX_SGI_swap_control)
-	// does not work with interval==0
-	if (interval && pGlxSwapIntervalSGI)
-		pGlxSwapIntervalSGI(interval);
-}
-#endif
-#endif
 }
 
 }

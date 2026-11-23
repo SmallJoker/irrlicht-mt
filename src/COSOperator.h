@@ -15,10 +15,6 @@ class CIrrDeviceLinux;
 class COSOperator : public IOSOperator
 {
 public:
-	// constructor
-#if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
-	COSOperator(const core::stringc &osVersion, CIrrDeviceLinux *device);
-#endif
 	COSOperator(const core::stringc &osVersion);
 
 	~COSOperator();
@@ -55,10 +51,6 @@ public:
 
 private:
 	core::stringc OperatingSystem;
-
-#if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
-	CIrrDeviceLinux *IrrDeviceLinux;
-#endif
 
 #ifdef _IRR_WINDOWS_API_
 	mutable core::stringc ClipboardBuf;
